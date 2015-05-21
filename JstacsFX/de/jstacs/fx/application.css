@@ -1,0 +1,94 @@
+.root{
+	-fx-font-family: sans-serif;
+}
+
+.name{
+	-fx-font-weight: bold;
+	
+}
+
+.comment{
+	-fx-font-style: italic;
+}
+
+.error{
+	-fx-font-style: italic;
+	-fx-text-fill: red;
+}
+
+.vbox {
+    -fx-border-color: black;
+    -fx-border-width: 1px;
+    -fx-padding: 5;
+    -fx-spacing: 2;
+}
+
+
+.list-cell{
+	-fx-background-color: white;
+	-fx-text-fill: black;
+	-fx-font-family: monospace;
+	-fx-padding: 0;
+}
+
+.list-cell:selected{
+	-fx-background-color: lightblue;
+}
+
+#protpane.scroll-pane > .viewport{ 
+	-fx-background-color: white; 
+}
+
+
+#protocol{
+	-fx-background-color: white;
+	 -fx-padding: 5;
+    -fx-spacing: 2;
+}
+
+#heading{
+	-fx-font-weight: bold;
+	-fx-text-fill: darkblue;
+}
+
+
+#warning{
+	-fx-font-style: italic;
+	-fx-text-fill: red;
+}
+
+#helpbutton{
+	-fx-font-weight: bold;
+	-fx-padding:0;
+	-fx-border-radius: 20;
+	-fx-background-radius: 20;
+}
+
+#splash{
+	-fx-font-size:16pt;
+	-fx-background-color:white;
+	-fx-padding: 5;
+	-fx-spacing:2;
+	-fx-alignment:center;
+}
+
+
+.overlay{
+	-fx-background-color:black;
+	-fx-text-fill:white;
+	-fx-font-weight:bold;
+	-fx-font-size:24pt;
+	-fx-border-radius: 20;
+	-fx-background-radius: 20;
+	-fx-padding: 10;
+}
+
+#errover{
+		-fx-background-color:red;
+}
+
+#succover{
+	-fx-background-color:darkgreen;
+}
+
+
