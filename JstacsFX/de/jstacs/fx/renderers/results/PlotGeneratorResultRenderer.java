@@ -62,7 +62,7 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 			view.setPreserveRatio( true );
 			
 //			view.fitWidthProperty().bind( parent.widthProperty() );
-			System.out.println("parent: "+parent+" w: "+parent.getWidth());
+			//System.out.println("parent: "+parent+" w: "+parent.getWidth());
 			view.setFitWidth( parent.getWidth() );
 			
 			ScrollPane pane = new ScrollPane( view );
