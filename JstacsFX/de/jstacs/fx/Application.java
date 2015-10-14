@@ -64,6 +64,7 @@ import de.jstacs.tools.JstacsTool;
 import de.jstacs.tools.ProgressUpdater;
 import de.jstacs.tools.Protocol;
 import de.jstacs.tools.ToolResult;
+import de.jstacs.utils.Compression;
 import de.jstacs.utils.Pair;
 
 
@@ -72,10 +73,12 @@ public class Application {
 	public class FXProtocol implements Protocol{
 
 		private TextFlow flow;
+		private StringBuffer log;
 		
 		public FXProtocol() {
 			flow = new TextFlow();
 			flow.setId( "protocol" );
+			log = new StringBuffer();
 		}
 		
 		public TextFlow getTextFlow(){
@@ -89,6 +92,7 @@ public class Application {
 				@Override
 				public void run() {
 					flow.getChildren().add( new Text(str) );
+					log.append( str );
 				}
 			} );
 			
@@ -103,6 +107,7 @@ public class Application {
 					Text text = new Text(heading);
 					text.setId( "heading" );
 					flow.getChildren().add( text );
+					log.append( "* "+heading );
 				}
 			} );
 			
@@ -117,6 +122,7 @@ public class Application {
 					Text text = new Text(warning);
 					text.setId( "warning" );
 					flow.getChildren().add( text );
+					log.append( warning );
 				}
 			} );
 			
@@ -140,11 +146,16 @@ public class Application {
 					Text text = new Text(strstr);
 					text.setId( "warning" );
 					flow.getChildren().add( text );
+					log.append(strstr);
 				}
 			} );
 			
 			
 			
+		}
+		
+		public String toString(){
+			return log.toString();
 		}
 		
 	}
@@ -203,7 +214,7 @@ public class Application {
 	}
 	
 	
-	private Pane getToolParameters(final JstacsTool tool, ParameterSet parameters ){
+	private Pane getToolParameters(final JstacsTool tool, ParameterSet parameters2 ){
 		
 		ParameterSetRenderer renderer = new ParameterSetRenderer();
 		
@@ -214,9 +225,9 @@ public class Application {
 		error.getStyleClass().add( "error" );
 		
 		Button b = new Button( "Run "+tool.getToolName()+"..." );
-		b.setDisable( !parameters.hasDefaultOrIsSet() );
+		b.setDisable( !parameters2.hasDefaultOrIsSet() );
 		
-		Pane p = renderer.render( parameters, new ToolReady( b, parameters ) );
+		Pane p = renderer.render( parameters2, new ToolReady( b, parameters2 ) );
 		
 		
 		
@@ -228,11 +239,19 @@ public class Application {
 			@Override
 			public void handle( ActionEvent arg0 ) {
 				
-				boolean ready = parameters.hasDefaultOrIsSet();
+				boolean ready = parameters2.hasDefaultOrIsSet();
 				
-				error.setText( parameters.getErrorMessage() );
+				error.setText( parameters2.getErrorMessage() );
 
 				if(!ready){
+					return;
+				}
+				
+				final ParameterSet parameters;
+				try {
+					parameters = parameters2.clone();
+				} catch (CloneNotSupportedException e1) {
+					messageOverlay.displayMessage("Internal error copying parameter values.", Level.WARNING);
 					return;
 				}
 				
@@ -294,7 +313,7 @@ public class Application {
 
 					@Override
 					public void handle( WorkerStateEvent arg0 ) {
-						System.out.println("onSucceeded");
+						//System.out.println("onSucceeded");
 						messageOverlay.displayMessage( tool.getToolName()+" finished successfully", Level.SUCCESS );
 						enqueuedJobs.remove( arg0.getSource() );
 						nameMap.remove( arg0.getSource() );
@@ -302,7 +321,7 @@ public class Application {
 
 						ResultSetResult toolResults = task.getValue();
 						ResultRepository.getInstance().add( toolResults );
-						System.out.println("succeeded");
+						//System.out.println("succeeded");
 						
 					}
 					
@@ -353,7 +372,7 @@ public class Application {
 				nameMap.put( task, new Pair<String,Date>(tool.getToolName(), new Date( System.currentTimeMillis() )) );
 				enqueuedJobs.add( enqueuedJobs.size(), task );
 				//enqueued.setText( "("+Math.max( 0, enqueuedJobs.size()-1)+" Jobs pending)" );
-				System.out.println("Job "+task+" enqueued");
+				//System.out.println("Job "+task+" enqueued");
 				
 				/*if(enqueuedJobs.size() == 1 ){
 					Thread thread = new Thread(task);
@@ -383,8 +402,8 @@ public class Application {
 			if(name.equals( tn )){
 				
 				ParameterSet tps = tools[i].getToolParameters();
-				System.out.println(tps);
-				System.out.println(res.getToolParameters());
+				//System.out.println(tps);
+				//System.out.println(res.getToolParameters());
 				res.setFromStoredParameters( tps );
 				
 				Pane content = getToolParameters( tools[i], tps );
@@ -393,7 +412,7 @@ public class Application {
 				
 				target.setExpanded( true );
 				
-				System.out.println("set ready");
+				//System.out.println("set ready");
 				
 				return;
 			}
@@ -534,7 +553,7 @@ public class Application {
 
 			@Override
 			public void handle( ActionEvent arg0 ) {
-				System.out.println("showing tasks");
+				//System.out.println("showing tasks");
 				tasks.show();				
 			}
 			
@@ -584,7 +603,7 @@ public class Application {
 				}else{
 					StringBuffer sb = ResultRepository.getInstance().storeResultsToXML();
 					try {
-						FileManager.writeFile( f, sb );
+						FileManager.writeFile( f, Compression.zip(sb.toString()) );
 					} catch ( IOException e ) {
 						e.printStackTrace();
 						messageOverlay.displayMessage( "Storing failed", Level.WARNING );
@@ -608,7 +627,7 @@ public class Application {
 					return;
 				}else{
 					try {
-						StringBuffer sb = FileManager.readFile( f );
+						StringBuffer sb = new StringBuffer(Compression.unzip(FileManager.readFile( f ).toString()) );
 						ResultRepository.getInstance().restoreResultsFromXML( sb );
 					} catch ( Exception e ) {
 						e.printStackTrace();
@@ -649,7 +668,7 @@ public class Application {
 			protected Pane call() throws Exception {
 				//System.out.println("starting...");
 				try{
-					Pane pane = app.prepare();
+					Pane pane = app.prepare(mainStage);
 					//System.out.println("finished");
 					return pane;
 				}catch(Exception e){
@@ -728,7 +747,7 @@ public class Application {
 		return lab2;
 	}
 	
-	private Pane prepare(){
+	private Pane prepare(Stage primaryStage){
 		BorderPane border = new BorderPane();
 		
 		HBox statusBar = createStatusBar();
@@ -785,7 +804,41 @@ public class Application {
 		protSP.setFitToWidth( true );
 		protSP.setId( "protpane" );
 		
-		protoTab.setContent( protSP );
+		HBox hb = new HBox();
+		hb.setPrefHeight(30);
+		hb.setAlignment(Pos.CENTER);
+		
+		Button saveProt = new Button("Save protocol...");
+		saveProt.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				FileChooser fc = new FileChooser();
+
+				fc.getExtensionFilters().add( new FileChooser.ExtensionFilter( "TXT", "*.txt" ) );
+				fc.setInitialFileName("protocol");
+				File f = fc.showSaveDialog( primaryStage );
+				if(f == null){
+					return;
+				}else{
+					try {
+						FileManager.writeFile(f, protocol.toString());
+					} catch (IOException e) {
+						messageOverlay.displayMessage("Protocol could not be saved.", Level.WARNING);
+					}
+				}
+			}
+			
+		});
+		hb.getChildren().add(saveProt);
+		
+		BorderPane protBP = new BorderPane();
+		protBP.setCenter(protSP);
+		protBP.setTop(hb);
+		
+		
+		
+		protoTab.setContent( protBP );
 		
 		Transition protoTrans = getTransition( protoTab );
 		
@@ -866,7 +919,7 @@ public class Application {
 	
 	public void startApplication( Stage primaryStage ) throws Exception {
 		
-		Pane border = prepare();
+		Pane border = prepare(primaryStage);
 		
 		showApplication( border, primaryStage );
 		
