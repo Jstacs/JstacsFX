@@ -187,12 +187,12 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		try {
 			
 			fres.fill( parameter );
-			System.out.println("adding");
+			//System.out.println("adding");
 			ResultRepository.getInstance().add( fres );
-			System.out.println("added");
+			//System.out.println("added");
 
 			box.getSelectionModel().select( new ResultContainer( fres ) );
-			System.out.println("selected: "+box.getSelectionModel().getSelectedIndex());
+			//System.out.println("selected: "+box.getSelectionModel().getSelectedIndex());
 			
 		} catch ( IllegalValueException e ) {
 			// TODO Auto-generated catch block
@@ -221,7 +221,7 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 			@Override
 			public void changed( ObservableValue<? extends ResultContainer> arg0, ResultContainer arg1, ResultContainer arg2 ) {
 				try{
-					System.out.println("selected "+arg2);
+					//System.out.println("selected "+arg2);
 					if(arg2 == null){
 						parameter.reset();
 					}else if(arg2.res instanceof TextResult){
