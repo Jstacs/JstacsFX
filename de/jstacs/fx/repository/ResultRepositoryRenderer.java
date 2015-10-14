@@ -279,7 +279,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 
 						@Override
 						public void handle( ActionEvent arg1 ) {
-							System.out.println("removing "+arg0.getValue().getValue());
+							//System.out.println("removing "+arg0.getValue().getValue());
 							
 							Alert alert = new Alert( AlertType.CONFIRMATION );
 							alert.setWidth( 300 );
@@ -325,7 +325,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 
 						@Override
 						public void handle( ActionEvent arg1 ) {
-							System.out.println("restarting "+arg0.getValue().getValue());
+							//System.out.println("restarting "+arg0.getValue().getValue());
 							
 							app.setParametersFromCopy( (ToolResult)arg0.getValue().getValue() );
 
@@ -362,7 +362,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		
 		ttv.getColumns().setAll( nameColumn, /*commentColumn,*/ valueColumn, dateCol, saveColumn, removeColumn , restartColumn);
 		
-		//nameColumn.setPrefWidth(200);
+		nameColumn.setPrefWidth(200);
 		//commentColumn.setPrefWidth(200);
 		
 		addResults(root,list);
@@ -427,7 +427,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 	}
 	
 	public boolean removeResult(Result res, TreeItem<Result> root){
-		System.out.println("removing ["+res+"] from "+root);
+		//System.out.println("removing ["+res+"] from "+root);
 		boolean b = root.getChildren().remove( itemMap.get( res ) );
 		if(b){
 			itemMap.remove( res );
