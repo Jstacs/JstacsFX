@@ -48,13 +48,13 @@
 
 #heading{
 	-fx-font-weight: bold;
-	-fx-text-fill: darkblue;
+	-fx-fill: darkblue;
 }
 
 
 #warning{
 	-fx-font-style: italic;
-	-fx-text-fill: red;
+	-fx-fill: red;
 }
 
 #helpbutton{
