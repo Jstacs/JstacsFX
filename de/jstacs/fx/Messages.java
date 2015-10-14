@@ -41,14 +41,14 @@ public class Messages {
 			@Override
 			public void onChanged( ListChangeListener.Change<? extends Pair<String, Level>> arg0 ) {
 				
-				System.out.println("changes");
+				//System.out.println("changes");
 				while( arg0.next() ){
 					if(messages.size() == 1 || (arg0.getRemovedSize()>0 && messages.size() > 0 ) ){
-						System.out.println("elements");
+						//System.out.println("elements");
 						Pair<String,Level> first = messages.get( 0 );
 						String text = first.getFirstElement();
 						Level level = first.getSecondElement();
-						System.out.println("text: "+text);
+						//System.out.println("text: "+text);
 						message.setText( text );
 						if(level == Level.WARNING){
 							message.setId( "errover" );
@@ -72,7 +72,7 @@ public class Messages {
 								box.setOpacity( 0.0 );
 								//message.setText( "" );
 								messages.remove( first );
-								System.out.println("removed "+text);
+								//System.out.println("removed "+text);
 							}
 
 						} );
