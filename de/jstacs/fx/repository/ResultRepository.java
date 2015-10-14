@@ -83,7 +83,7 @@ public class ResultRepository {
 	}
 	
 	public void add(Result result, boolean store){
-		this.results.addFirst( result );
+		this.results.add( result );
 		notifyAdd( result );
 		if(store){
 			autostore();
@@ -187,7 +187,7 @@ public class ResultRepository {
 	public void restoreResultsFromXML(StringBuffer sb) throws NonParsableException{
 		Result[] temp = (Result[])XMLParser.extractObjectForTags( sb, "results" );
 		for(int i=0;i<temp.length;i++){
-			this.add( temp[temp.length-i-1], false );
+			this.add( temp[i], false );
 		}
 	}
 	
