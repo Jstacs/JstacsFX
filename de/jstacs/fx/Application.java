@@ -150,8 +150,10 @@ public class Application {
 				}
 			} );
 			
-			
-			
+		}
+		
+		public void appendVerbatim(String verbatim) {
+			append(verbatim);
 		}
 		
 		public String toString(){

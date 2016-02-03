@@ -203,7 +203,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 			public ObservableValue<Button> call( CellDataFeatures<Result, Button> arg0 ) {
 				
 				final Result res = arg0.getValue().getValue();
-				final ResultSaver saver = ResultSaverLibrary.getSaver( res );
+				final ResultSaver saver = ResultSaverLibrary.getSaver( res.getClass() );
 				
 				if(saver != null){
 
