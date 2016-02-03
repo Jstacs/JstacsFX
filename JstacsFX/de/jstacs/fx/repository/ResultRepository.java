@@ -166,7 +166,7 @@ public class ResultRepository {
 					}
 				}
 			}else{
-				ResultSaver saver = ResultSaverLibrary.getSaver( r );
+				ResultSaver saver = ResultSaverLibrary.getSaver( r.getClass() );
 				if(saver != null){
 					String[] exts = saver.getFileExtensions( r );
 					if(TextResult.equals( exts, mime )){

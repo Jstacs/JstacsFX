@@ -46,7 +46,7 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 				if(res instanceof TextResult){
 					frint2 = ((TextResult)res).getValue();
 				}else{
-					ResultSaver saver = ResultSaverLibrary.getSaver( res );
+					ResultSaver saver = ResultSaverLibrary.getSaver( res.getClass() );
 					if(saver != null){
 						StringBuffer sb = new StringBuffer();
 						saver.writeOutput( res, sb );
@@ -131,7 +131,7 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 					collectForModification( temp[i], toModify );
 				}
 			}else{
-				ResultSaver saver = ResultSaverLibrary.getSaver( result );
+				ResultSaver saver = ResultSaverLibrary.getSaver( result.getClass() );
 				if(saver != null){
 					String[] exts = saver.getFileExtensions( result );
 					if(TextResult.equals( exts, parameter.getAcceptedMimeType() )){
