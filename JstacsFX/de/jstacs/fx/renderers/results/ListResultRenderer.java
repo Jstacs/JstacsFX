@@ -13,11 +13,22 @@ import javafx.scene.control.TableView;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import de.jstacs.results.ListResult;
+import de.jstacs.results.Result;
 import de.jstacs.results.ResultSet;
 
-
+/**
+ * Class for rendering a {@link ListResult} in the JavaFX GUI. The contents are rendered by a {@link TableView}
+ * using the column names provided by {@link Result#getName()} of the {@link ListResult} entries.
+ * An additional column with row numbers is added to the table as a first column.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class ListResultRenderer implements ResultRenderer<ListResult> {
 
+	/**
+	 * Registers this {@link ResultRenderer} for class {@link ListResult}.
+	 */
 	public static void register(){
 		ResultRendererLibrary.register( ListResult.class, new ListResultRenderer() );
 	}

@@ -17,9 +17,19 @@ import javafx.scene.layout.Pane;
 import de.jstacs.results.PlotGeneratorResult;
 import de.jstacs.utils.graphics.RasterizedAdaptor;
 
-
+/**
+ * Class for rendering {@link PlotGeneratorResult}s in the JavaFX GUI.
+ * The image from the {@link PlotGeneratorResult} is created using the {@link RasterizedAdaptor} and may be scaled using button controls (+,-,Fit). If the image does not fit the pane,
+ * scroll bars are added to the pane.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGeneratorResult> {
 
+	/**
+	 * Registers this {@link ResultRenderer} for class {@link PlotGeneratorResult}.
+	 */
 	public static void register(){
 		ResultRendererLibrary.register( PlotGeneratorResult.class, new PlotGeneratorResultRenderer() );
 	}

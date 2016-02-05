@@ -6,9 +6,17 @@ import javafx.scene.layout.VBox;
 import de.jstacs.results.ResultSetResult;
 import de.jstacs.tools.ToolResult;
 
-
+/**
+ * Renderer for a {@link ResultSetResult}. Currently, the {@link ResultSetResultRenderer#render(ResultSetResult, Pane)} method only returns an empty {@link VBox}
+ * but may be extended to a structured view on a set of results in the future.
+ * @author Jan Grau
+ *
+ */
 public class ResultSetResultRenderer implements ResultRenderer<ResultSetResult> {
 
+	/**
+	 * Registers this {@link ResultRenderer} for classes {@link ResultSetResult} and {@link ToolResult}.
+	 */
 	public static void register(){
 		ResultRendererLibrary.register( ResultSetResult.class, new ResultSetResultRenderer() );
 		ResultRendererLibrary.register( ToolResult.class, new ResultSetResultRenderer() );
