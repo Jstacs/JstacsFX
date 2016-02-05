@@ -13,9 +13,17 @@ import de.jstacs.parameters.ParameterSet;
 import de.jstacs.parameters.SelectionParameter;
 import de.jstacs.parameters.SimpleParameter.IllegalValueException;
 
-
+/**
+ * {@link ParameterRenderer} for rendering {@link SelectionParameter} as a drop-down list ({@link ChoiceBox}) of possible options.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class SelectionParameterRenderer extends AbstractParameterRenderer<SelectionParameter> {
 	
+	/**
+	 * Registers this {@link ParameterRenderer} for the class {@link SelectionParameter}.
+	 */
 	public static void register(){
 		ParameterRendererLibrary.register( SelectionParameter.class, new SelectionParameterRenderer() );
 	}

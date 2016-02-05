@@ -28,7 +28,15 @@ import de.jstacs.results.TextResult;
 import de.jstacs.results.savers.ResultSaver;
 import de.jstacs.results.savers.ResultSaverLibrary;
 
-
+/**
+ * Class for rendering a {@link FileParameter} in the JavaFX GUI.
+ * 
+ * The {@link FileParameter} is rendered as a drop-down list of all admissible files (or results) that are already in the {@link ResultRepository} and
+ * a button for loading new files from disk. This button opens a file dialog for selecting files from disk.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class FileParameterRenderer extends AbstractParameterRenderer<FileParameter> {
 
 	private static class ResultContainer{
@@ -73,7 +81,9 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		
 	}
 	
-	
+	/**
+	 * Registers this {@link ParameterRenderer} for class {@link FileParameter} in the {@link ParameterRendererLibrary}.
+	 */
 	public static void register(){
 		ParameterRendererLibrary.register( FileParameter.class, new FileParameterRenderer() );
 	}
@@ -165,6 +175,15 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		return items;
 	}
 	
+	/**
+	 * Loads the contents of a file. Opens a file dialog for selecting the input file, adds the corresponding {@link FileRepresentation}
+	 * to the {@link ResultRepository}, and selects the loaded file in the drop-down list of admissible files.
+	 * Extensions of accepted files are obtained from the {@link FileParameter#getAcceptedMimeType()} method.
+	 * @param parameter the {@link FileParameter} that is rendered
+	 * @param box the drop-down list of admissible files
+	 * @param error the error label, required if a file could not be loaded
+	 * @param ready the object for checking if all parameters have been set
+	 */
 	protected void loadFromFile(FileParameter parameter, ChoiceBox<ResultContainer> box, Label error, ToolReady ready){
 		
 		FileChooser fc = new FileChooser();
