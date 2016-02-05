@@ -7,9 +7,17 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 import de.jstacs.results.TextResult;
 
-
+/**
+ * Renders a {@link TextResult} in the JavaFX GUI. This renderer uses a {@link ListView} for displaying the lines
+ * of the {@link TextResult} for efficiency.
+ * @author Jan Grau
+ *
+ */
 public class TextResultRenderer implements ResultRenderer<TextResult> {
 
+	/**
+	 * Registers this {@link ResultRenderer} for class {@link TextResult}.
+	 */
 	public static void register(){
 		ResultRendererLibrary.register( TextResult.class, new TextResultRenderer() );
 	}
