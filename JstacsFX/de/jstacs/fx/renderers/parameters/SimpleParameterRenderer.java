@@ -12,9 +12,16 @@ import de.jstacs.fx.Application.ToolReady;
 import de.jstacs.parameters.SimpleParameter;
 import de.jstacs.parameters.SimpleParameter.IllegalValueException;
 
-
+/**
+ * Parameter renderer for {@link SimpleParameter}s as a simple input field ({@link TextField}).
+ * @author Jan Grau
+ *
+ */
 public class SimpleParameterRenderer extends AbstractParameterRenderer<SimpleParameter> {
 	
+	/**
+	 * Registers this {@link ParameterRenderer} for the class {@link SimpleParameter}
+	 */
 	public static void register(){
 		ParameterRendererLibrary.register( SimpleParameter.class, new SimpleParameterRenderer() );
 	}
