@@ -55,7 +55,20 @@ import de.jstacs.results.savers.ResultSaver;
 import de.jstacs.results.savers.ResultSaverLibrary;
 import de.jstacs.tools.ToolResult;
 
-
+/**
+ * The class renders the contents of the current {@link ResultRepository} in the JavaFX GUI.
+ * The results are rendered in a {@link TreeTableView} with top-level entries corresponding to top-level
+ * {@link Result}s in the {@link ResultRepository}. If these top-level entries are aggregate types like {@link ResultSetResult}s,
+ * they may be expanded to also list their content {@link Result}s.
+ * {@link Result}s with appropriate {@link ResultRenderer}s will be rendered in another {@link BorderPane} of the JavaFX GUI.
+ * {@link Result}s with appropriate {@link ResultSaver}s may be stored to disk using a "Save" (or "Save all" in case of aggregate results) button also displayed
+ * in the {@link TreeTableView}.
+ * Top-level {@link Result}s may removed from the view (and the {@link ResultRepository}) via a "Remove" button.
+ * This class implements {@link ResultConsumer} is is automatically notified if new results are added to the {@link ResultRepository}.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class ResultRepositoryRenderer implements ResultConsumer{
 
 	private Control c;
@@ -65,7 +78,13 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 	private BorderPane viewerPane;
 	private Application app;
 	
-	
+	/**
+	 * Creates a new {@link ResultRepositoryRenderer} for the current {@link Application}, where
+	 * {@link Result}s with appropriate {@link ResultRenderer}s are displayed in the supplied {@link BorderPane}
+	 * upon selection.
+	 * @param viewerPane the pane for displaying results
+	 * @param app the surrounding {@link Application}
+	 */
 	public ResultRepositoryRenderer(BorderPane viewerPane, Application app){
 		itemMap = new HashMap<>();
 		c = renderRepository();
@@ -74,10 +93,18 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		this.app = app;
 	}
 		
+	/**
+	 * Returns the Control (i.e., the {@link TreeTableView} in the current implementation) that renders the {@link ResultRepository} contents.
+	 * @return the control
+	 */
 	public Control getControl(){
 		return c;
 	}
 	
+	/**
+	 * Adds a listener to the list of elements in the {@link TreeTableView}.
+	 * @param listener the listener
+	 */
 	public void addListener(ListChangeListener listener){
 		root.getChildren().addListener( listener );
 	}
@@ -398,7 +425,10 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		
 	}
 	
-	
+	/**
+	 * Adds a result to the rendered view. Will be called via the {@link ResultConsumer} interface.
+	 * @param res the new {@link Result}
+	 */
 	public void addResult(Result res){
 		addResult( res, root );
 	}
@@ -421,12 +451,17 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		}
 		ttv.getSelectionModel().clearSelection();
 	}
-	
+
+	/**
+	 * Removes a result from the rendered view. Will be called via the {@link ResultConsumer} interface.
+	 * @param res the new {@link Result}
+	 * @return if the result could be removed
+	 */
 	public boolean removeResult(Result res){
 		return removeResult( res, root );
 	}
 	
-	public boolean removeResult(Result res, TreeItem<Result> root){
+	private boolean removeResult(Result res, TreeItem<Result> root){
 		//System.out.println("removing ["+res+"] from "+root);
 		boolean b = root.getChildren().remove( itemMap.get( res ) );
 		if(b){
