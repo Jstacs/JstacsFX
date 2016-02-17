@@ -1,6 +1,7 @@
 package de.jstacs.fx.renderers.parameters;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -88,6 +89,24 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		ParameterRendererLibrary.register( FileParameter.class, new FileParameterRenderer() );
 	}
 	
+	/**
+	 * Returns the {@link ChoiceBox} that represents this provided {@link FileParameter} in the GUI.
+	 * @param parameter the parameter
+	 * @return the box
+	 */
+	public static ChoiceBox getBox(FileParameter parameter){
+		ArrayList<ResultConsumer> consumers = ResultRepository.getInstance().getConsumers();
+		for(int i=0;i<consumers.size();i++){
+			ResultConsumer cons = consumers.get(i);
+			if(cons instanceof FileResultConsumer){
+				if( ((FileResultConsumer)cons).parameter == parameter ){
+					return ((FileResultConsumer) cons).box;
+				}
+			}
+		}
+		return null;
+	}
+	
 	private FileParameterRenderer(){
 		
 	}
@@ -100,6 +119,10 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		public FileResultConsumer(FileParameter parameter, ChoiceBox<ResultContainer> box){
 			this.parameter = parameter;
 			this.box = box;
+		}
+		
+		public ChoiceBox getBox(){
+			return box;
 		}
 		
 		/*private void collectForAddition( Result added, LinkedList<ResultContainer> toAdd ){
@@ -271,6 +294,7 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 				
 				for(int i=0;i<items.length && !found;i++){
 					FileRepresentation temp = items[i].getFileRepresentation();
+					//System.out.println(filename+" <-> "+temp.getFilename());
 					if(temp != null && filename.equals( temp.getFilename() )){
 						box.getSelectionModel().select( items[i] );
 						//System.out.println("selected "+filename);

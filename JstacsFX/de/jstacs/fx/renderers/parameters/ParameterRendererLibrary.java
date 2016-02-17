@@ -21,6 +21,7 @@ public class ParameterRendererLibrary {
 		FileParameterRenderer.register();
 		SelectionParameterRenderer.register();
 		SimpleParameterRenderer.register();
+		DataColumnParameterRenderer.register();
 	}
 	
 	
