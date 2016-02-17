@@ -8,10 +8,21 @@ import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-
+/**
+ * Class for displaying a splash screen while the main window of the {@link Application} is loading. 
+ * This is especially useful if the workspace is automatically stored
+ * to disk, as re-loading of the workspace may take substantial time for larger workspaces.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class SplashScreen extends Scene {
 
-	
+	/**
+	 * Prepares the splash screen for display and returns the corresponding pane.
+	 * @param title the text displayed in the splash screen
+	 * @return the pane for displaying the splash screen
+	 */
 	public static Pane prepare(String title){
 		BorderPane content = new BorderPane();
 		System.out.println(title);
@@ -34,11 +45,19 @@ public class SplashScreen extends Scene {
 		return content;
 	}
 	
+	/**
+	 * Creates a new splash screen for the pane as provided by {@link #prepare(String)}.
+	 * @param prepared the prepared pane
+	 */
 	public SplashScreen(Pane prepared) {
 		super(prepared, 500, 200);
 		
 	}
 	
+	/**
+	 * Shows the splash screen for the main window with given primary stage
+	 * @param primaryStage the primary stage
+	 */
 	public void show(Stage primaryStage){
 		
 	}
