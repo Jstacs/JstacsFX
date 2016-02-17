@@ -73,17 +73,19 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 			
 //			view.fitWidthProperty().bind( parent.widthProperty() );
 			//System.out.println("parent: "+parent+" w: "+parent.getWidth());
-			view.setFitWidth( parent.getWidth() );
+		
 			
 			ScrollPane pane = new ScrollPane( view );
 			
 			HBox bar = new HBox(20);
+			
 			Button plus = new Button( "+" );
 			plus.setOnAction( new EventHandler<ActionEvent>() {
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
-					view.setFitWidth( view.getFitWidth()*1.1 );					
+					view.setFitWidth( view.getFitWidth()*1.1 );
+					view.setFitHeight(-1);
 				}
 			} );
 			Button minus = new Button( "-" );
@@ -91,7 +93,8 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
-					view.setFitWidth( view.getFitWidth()/1.1 );					
+					view.setFitWidth( view.getFitWidth()/1.1 );	
+					view.setFitHeight(-1);
 				}
 			} );
 			Button fit = new Button( "Fit" );
@@ -99,7 +102,8 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
-					view.setFitWidth( parent.getWidth() );					
+					view.setFitWidth( parent.getWidth()-5 );
+					view.setFitHeight(parent.getHeight() - bar.getHeight()-5);
 				}
 			} );
 			
@@ -108,6 +112,9 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 			BorderPane both = new BorderPane();
 			both.setTop( bar );
 			both.setCenter( pane );
+		
+			view.setFitWidth( parent.getWidth()-5 );
+			view.setFitHeight(parent.getHeight() - 30);
 			
 			return both;
 		}catch(Exception e){
