@@ -27,9 +27,19 @@ import org.w3c.dom.html.HTMLAnchorElement;
 import de.jstacs.tools.JstacsTool;
 
 
-
+/**
+ * Class for displaying the help text of a {@link JstacsTool} ({@link JstacsTool#getHelpText()}) in the JavaFX GUI.
+ * The help text is displayed in a separate window and the help text is converted from re-structured text to HTML.
+ *  
+ * @author Jan Grau
+ *
+ */
 public class HelpViewer extends Stage {
 
+	/**
+	 * Creates a new {@link HelpViewer} for a specific {@link JstacsTool}.
+	 * @param tool the tool
+	 */
 	public HelpViewer(JstacsTool tool){
 		super();
 		this.setTitle( "Help for "+tool.getToolName() );

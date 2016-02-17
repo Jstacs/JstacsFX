@@ -20,15 +20,36 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Callback;
 import de.jstacs.results.ResultSetResult;
+import de.jstacs.tools.JstacsTool;
 import de.jstacs.utils.Pair;
 
-
+/**
+ * Class for rendering a list of currently running or scheduled tasks in an {@link Application}.
+ * Tasks that are scheduled may be removed from the list by pressing a "cancel" button. Tasks currently running
+ * may also be canceled but (depending on the {@link JstacsTool} implementation) may nonetheless run all computations
+ * until the end of the corresponding {@link JstacsTool#run(de.jstacs.parameters.ParameterSet, de.jstacs.tools.Protocol, de.jstacs.tools.ProgressUpdater, int)}
+ * method.
+ * 
+ * Tasks are shown as rows of a {@link TableView} with the corresponding {@link JstacsTool} name, the date (and time) of starting the task, and
+ * a cancel button.
+ * 
+ * The task viewer is shown in a separate window.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class TaskViewer extends Stage {
 
 	//private ObservableList<Task<ResultSetResult>> enqueued;
 	//private HashMap<Task<ResultSetResult>,Pair<String, Date>> nameMap;
 	private TableView<Task<ResultSetResult>> table;
 	
+	/**
+	 * Creates a new tasks viewer for the list of enqueued tasks and the map from task objects
+	 * to corresponding tool names and start dates.
+	 * @param enqueued the list of enqueued {@link Task}s
+	 * @param nameMap the map from tasks to names and start dates
+	 */
 	public TaskViewer(ObservableList<Task<ResultSetResult>> enqueued, HashMap<Task<ResultSetResult>,Pair<String, Date>> nameMap) {
 		//this.enqueued = enqueued;
 		//this.nameMap = nameMap;

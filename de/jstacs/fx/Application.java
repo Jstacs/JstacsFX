@@ -52,6 +52,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 import javafx.util.Duration;
+import sun.tools.jstat.Jstat;
 import de.jstacs.fx.Messages.Level;
 import de.jstacs.fx.renderers.parameters.ParameterSetRenderer;
 import de.jstacs.fx.repository.ResultRepository;
@@ -67,20 +68,52 @@ import de.jstacs.tools.ToolResult;
 import de.jstacs.utils.Compression;
 import de.jstacs.utils.Pair;
 
-
+/**
+ * Class that displays the main window of the JavaFX application, creates all necessary views, and mutually registers
+ * listeners and consumers  of the different components.
+ * 
+ * The tool parameters are displayed in the left column of the main window using a {@link TitledPane} for each tool,
+ * which may be expanded to enter parameter values, which also triggers collapsing the parameter lists of all other tools.
+ * In the header of each tool, a help button is shown, which triggers display of the corresponding {@link HelpViewer}.
+ * 
+ * The {@link ResultRepositoryRenderer} and the {@link FXProtocol} are displayed in tabs at the bottom right of the main window.
+ * A pane for displaying results is rendered at the top right of the main window.
+ * 
+ * A bottom bar displays the current progress of a running tool, allows for opening a list of all scheduled tasks,
+ * and provides buttons for saving and loading the workspace.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class Application {
 
+	/**
+	 * Class for a protocol displayed in the JavaFX GUI as a {@link TextFlow}.
+	 * If different tools are run in succession, protocol outputs are appended to the previous
+	 * state of the protocol.
+	 * 
+	 * @author Jan Grau
+	 *
+	 */
 	public class FXProtocol implements Protocol{
 
 		private TextFlow flow;
 		private StringBuffer log;
 		
+		/**
+		 * Creates a new protocol.
+		 */
 		public FXProtocol() {
 			flow = new TextFlow();
 			flow.setId( "protocol" );
 			log = new StringBuffer();
 		}
 		
+		/**
+		 * Returns the {@link TextFlow} object representing the current view on the protocols
+		 * of all tools.
+		 * @return the {@link TextFlow} object
+		 */
 		public TextFlow getTextFlow(){
 			return flow;
 		}
@@ -159,25 +192,52 @@ public class Application {
 		public String toString(){
 			return log.toString();
 		}
+
+		@Override
+		public void flush() throws IOException {
+			
+		}
 		
 	}
 	
+	/**
+	 * Class that tests if all required parameter values have been set for a {@link JstacsTool} via {@link Parameter#hasDefaultOrIsSet()}.
+	 * Only if all parameters have been set, the provided "Run" button is activated. 
+	 * @author Jan Grau
+	 *
+	 */
 	public static class ToolReady{
 		
 		private Button runButton;
 		private ParameterSet toolParameters;
 		private LinkedList<Pair<Parameter,Label>> errorList;
 		
+		/**
+		 * Creates a new test for the {@link JstacsTool} with the specified "Run" button
+		 * and parameters.
+		 * @param runButton the "Run" button for the tool, activated if all parameter values have been set
+		 * @param toolParameters the parameters of the corresponding tool
+		 */
 		public ToolReady(Button runButton, ParameterSet toolParameters){
 			this.runButton = runButton;
 			this.toolParameters = toolParameters;
 			this.errorList = new LinkedList<>();
 		}
 		
+		/**
+		 * Registers the label displaying the error message for a parameter.
+		 * @param par the parameter
+		 * @param error the label
+		 */
 		public void addErrorLabel(Parameter par, Label error){
 			errorList.add( new Pair<Parameter, Label>( par, error ) );
 		}
 		
+		/**
+		 * Tests if all parameter values have been set. If this is the case,
+		 * the "Run" button is activated. Otherwise, the error labels corresponding to
+		 * the failing parameter(s) are filled with the error messages returned by {@link Parameter#getErrorMessage()}.
+		 */
 		public void testReady(){
 			runButton.setDisable( !toolParameters.hasDefaultOrIsSet() );
 			for(int i=0;i<errorList.size();i++){
@@ -188,8 +248,12 @@ public class Application {
 		
 	}
 	
-	public static Preferences prefs = Preferences.userNodeForPackage( Application.class );
 	
+	private static Preferences prefs = Preferences.userNodeForPackage( Application.class );
+	
+	/**
+	 * The main window of the current {@link Application}.
+	 */
 	public static Window mainWindow;//TODO cleaner solution
 	
 	private ObservableList<Task<ResultSetResult>> enqueuedJobs;
@@ -206,6 +270,12 @@ public class Application {
 
 	private HashMap<String,TitledPane> paneMap;
 	
+	/**
+	 * Creates a new {@link Application} with the provided title in the main window for
+	 * the given {@link JstacsTool}s.
+	 * @param title the title of the main window
+	 * @param tools the tools used in this application
+	 */
 	public Application(String title, JstacsTool... tools){
 		this.title = title;
 		this.tools = tools;
@@ -289,7 +359,7 @@ public class Application {
 						protocol.appendHeading( "Starting "+tool.getToolName()+"...\n\n" );
 						try{
 							
-							ToolResult res = tool.run( parameters, protocol, progress );//TODO
+							ToolResult res = tool.run( parameters, protocol, progress, Runtime.getRuntime().availableProcessors() );//TODO
 
 							
 							protocol.append( "\n...finished.\n" );
@@ -395,6 +465,12 @@ public class Application {
 		return p;
 	}
 	
+	/**
+	 * Sets the parameter values of one of the {@link JstacsTool}s to those
+	 * that are stored in the provided {@link ToolResult}. This allows tools to
+	 * be re-run with identical or modified parameters.
+	 * @param res the {@link ToolResult} containing the parameters of the previous run
+	 */
 	public void setParametersFromCopy(ToolResult res){
 		String tn = res.getToolName();
 		TitledPane target = paneMap.get( tn );
@@ -478,7 +554,8 @@ public class Application {
 			
 			paneMap.put(title,titled);
 			
-			titled.setExpanded( false );
+			titled.setExpanded( tools.length == 1 );
+			
 			acc.getChildren().add( titled );
 			//acc.getPanes().add( titled );
 			titleds[i] = titled;
@@ -649,7 +726,13 @@ public class Application {
 		return statusBar;
 	}
 	
-	
+	/**
+	 * Starts the {@link Application} displaying a splash window until the main window
+	 * is fully loaded. This is especially useful if the workspace is automatically stored
+	 * to disk, as re-loading of the workspace may take substantial time for larger workspaces.
+	 * @param primaryStage the primary stage forwarded from {@link javafx.application.Application#start(Stage)}
+	 * @param message the message displayed in the splash window
+	 */
 	public void startWithSplash( Stage primaryStage, String message ){
 		
 		Application app = this;
@@ -919,6 +1002,11 @@ public class Application {
 		primaryStage.show();
 	}
 	
+	/**
+	 * Starts the Application without a splash window.
+	 * @param primaryStage the primary stage forwarded from {@link javafx.application.Application#start(Stage)}
+	 * @throws Exception if the application could not be started
+	 */
 	public void startApplication( Stage primaryStage ) throws Exception {
 		
 		Pane border = prepare(primaryStage);

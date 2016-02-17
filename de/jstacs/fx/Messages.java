@@ -13,12 +13,33 @@ import javafx.scene.layout.Pane;
 import javafx.util.Duration;
 import de.jstacs.utils.Pair;
 
-
+/**
+ * Class for displaying overlay messages (Tool started, tool failed, tool finished) stacked on top of the 
+ * main window of the JavaFX {@link Application}. These overlays do not capture mouse events and may, hence, be used
+ * to display messages without interrupting user interaction.
+ * 
+ * @author Jan Grau
+ *
+ */
 public class Messages {
 
+	/**
+	 * The severity level of a message
+	 * @author Jan Grau
+	 *
+	 */
 	public enum Level{
+		/**
+		 * Success, message displayed with green background
+		 */
 		SUCCESS,
+		/**
+		 * Neutral, message displayed with grey background
+		 */
 		INFO,
+		/**
+		 * Warning or error, message displayed with red background
+		 */
 		WARNING
 	}
 	
@@ -26,6 +47,9 @@ public class Messages {
 	private HBox box;
 	private ObservableList<Pair<String,Level>> messages;
 	
+	/**
+	 * Creates a new renderer for overlay messages
+	 */
 	public Messages(){
 		box = new HBox();
 		box.setAlignment( Pos.CENTER );
@@ -84,11 +108,21 @@ public class Messages {
 		
 	}
 	
+	/**
+	 * Returns the component pane for rendering the messages.
+	 * 
+	 * @return the pane
+	 */
 	public Pane getMessagePane(){
 		return box;
 	}
 	
-	
+	/**
+	 * Adds a message to the queue of messages. Messages will be displayed in the order
+	 * of submission. Each message is displayed at least 1.5 seconds.
+	 * @param text the text of the message
+	 * @param level the severity level of the message
+	 */
 	public void displayMessage(String text, Level level){
 		
 		messages.add( new Pair<String, Messages.Level>( text, level ) );
