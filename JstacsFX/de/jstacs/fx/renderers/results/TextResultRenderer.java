@@ -83,7 +83,7 @@ public class TextResultRenderer implements ResultRenderer<TextResult> {
 			
 			String sep = "\t";
 			
-			if(result.getValue().getExtension().equalsIgnoreCase("csv")){
+			if("csv".equalsIgnoreCase(result.getValue().getExtension())){
 				sep = ",";
 			}
 			
@@ -100,103 +100,105 @@ public class TextResultRenderer implements ResultRenderer<TextResult> {
 			
 			String[] lines = cont.split("\n");
 			
-			int i=0;
-			if(hasHeader){
-				i=1;
-			}
-			
-			Object[][] content = new Object[lines.length-i][];
-			
-			Class[] types = new Class[head.length];
-			
-			for(int j=0;j<content.length;j++){
-				String[] parts = lines[j+i].split(sep);
-				content[j] = new Object[parts.length];
-				for(int k=0;k<parts.length;k++){
-					try{
-						Integer.parseInt(parts[k]);
-						if(types[k] == null || types[k].equals(Integer.class)){
-							types[k] = Integer.class;
-						}
-					}catch(NumberFormatException e){
+			if(lines.length > 0){
+
+				int i=0;
+				if(hasHeader){
+					i=1;
+				}
+
+				Object[][] content = new Object[lines.length-i][];
+
+				Class[] types = new Class[head.length];
+
+				for(int j=0;j<content.length;j++){
+					String[] parts = lines[j+i].split(sep);
+					content[j] = new Object[parts.length];
+					for(int k=0;k<parts.length;k++){
 						try{
-							Double.parseDouble(parts[k]);
-							if(types[k] == null || types[k].equals(Integer.class) || types[k].equals(Double.class)){
-								types[k] = Double.class;
+							Integer.parseInt(parts[k]);
+							if(types[k] == null || types[k].equals(Integer.class)){
+								types[k] = Integer.class;
 							}
-						}catch(NumberFormatException ex){
-							types[k] = String.class;
+						}catch(NumberFormatException e){
+							try{
+								Double.parseDouble(parts[k]);
+								if(types[k] == null || types[k].equals(Integer.class) || types[k].equals(Double.class)){
+									types[k] = Double.class;
+								}
+							}catch(NumberFormatException ex){
+								types[k] = String.class;
+							}
 						}
-					}
-					content[j][k] = parts[k];
-				}
-			}
-			
-			for(int j=0;j<content.length;j++){
-				for(int k=0;k<content[j].length;k++){
-					if(types[k].equals(Integer.class)){
-						content[j][k] = Integer.parseInt((String)content[j][k]);
-					}else if(types[k].equals(Double.class)){
-						content[j][k] = Double.parseDouble((String)content[j][k]);
+						content[j][k] = parts[k];
 					}
 				}
-			}
-			
-			TableColumn[] cols = new TableColumn[head.length];
-			
-			for(int j=0;j<head.length;j++){
-				final int col = j;
-				if( Number.class.isAssignableFrom(types[j]) ){
-					TableColumn<Object[], Number> numCol = new TableColumn<Object[], Number>(head[j]);
-					numCol.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Object[],Number>, ObservableValue<Number>>() {
 
-						@Override
-						public ObservableValue<Number> call( CellDataFeatures<Object[], Number> arg0 ) {
-							return new ReadOnlyObjectWrapper<Number>((Number)arg0.getValue()[col]);
+				for(int j=0;j<content.length;j++){
+					for(int k=0;k<content[j].length;k++){
+						if(types[k].equals(Integer.class)){
+							content[j][k] = Integer.parseInt((String)content[j][k]);
+						}else if(types[k].equals(Double.class)){
+							content[j][k] = Double.parseDouble((String)content[j][k]);
 						}
-						
-					} );
-					cols[j] = numCol;
-				}else{
-					TableColumn<Object[], String> strCol = new TableColumn<Object[], String>(head[j]);
-					strCol.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Object[],String>, ObservableValue<String>>() {
-
-						@Override
-						public ObservableValue<String> call( CellDataFeatures<Object[], String> arg0 ) {
-							return new ReadOnlyStringWrapper( arg0.getValue()[col].toString() );
-						}
-					} );
-					cols[j] = strCol;
+					}
 				}
+
+				TableColumn[] cols = new TableColumn[head.length];
+
+				for(int j=0;j<head.length;j++){
+					final int col = j;
+					if( types[j] != null && Number.class.isAssignableFrom(types[j]) ){
+						TableColumn<Object[], Number> numCol = new TableColumn<Object[], Number>(head[j]);
+						numCol.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Object[],Number>, ObservableValue<Number>>() {
+
+							@Override
+							public ObservableValue<Number> call( CellDataFeatures<Object[], Number> arg0 ) {
+								return new ReadOnlyObjectWrapper<Number>((Number)arg0.getValue()[col]);
+							}
+
+						} );
+						cols[j] = numCol;
+					}else{
+						TableColumn<Object[], String> strCol = new TableColumn<Object[], String>(head[j]);
+						strCol.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Object[],String>, ObservableValue<String>>() {
+
+							@Override
+							public ObservableValue<String> call( CellDataFeatures<Object[], String> arg0 ) {
+								return new ReadOnlyStringWrapper( arg0.getValue()[col].toString() );
+							}
+						} );
+						cols[j] = strCol;
+					}
+				}
+
+				TableView<Object[]> tv = new TableView<>();
+				tv.getColumns().addAll( cols );
+				tv.setItems( FXCollections.observableArrayList( content ) );
+
+				return tv;
 			}
 			
-			TableView<Object[]> tv = new TableView<>();
-			tv.getColumns().addAll( cols );
-			tv.setItems( FXCollections.observableArrayList( content ) );
-		
-			return tv;
-			
-			
-		}else{
+		}
 
-			ListView<String> lv = new ListView<>();
-			ObservableList<String> items =FXCollections.observableArrayList ( result.getValue().getContent().split( "\n" ) );
-			lv.setItems( items );
+		ListView<String> lv = new ListView<>();
+		ObservableList<String> items =FXCollections.observableArrayList ( result.getValue().getContent().split( "\n" ) );
+		lv.setItems( items );
 
-			/*TextArea ta = new TextArea();
+		/*TextArea ta = new TextArea();
 		ta.setEditable( false );
 		ta.setText( result.getValue().getContent() );
 		ta.setCache( true );*/
 
-			/*Text text = new Text(result.getValue().getContent());
+		/*Text text = new Text(result.getValue().getContent());
 		TextFlow flow = new TextFlow(text);
 
 		ScrollPane pane = new ScrollPane( flow );
 
 		return pane;*/
 
-			return lv;
-		}
+		return lv;
+
 	}
 
 }
