@@ -52,6 +52,8 @@ public class ResultRepository {
 		 */
 		public void notifyRemoved(Result removed);
 		
+		public void notifyRefresh(Result renamed);
+		
 	}
 	
 	/**
@@ -106,6 +108,12 @@ public class ResultRepository {
 	private void notifyAdd(Result result){
 		for(int i=0;i<consumers.size();i++){
 			consumers.get( i ).notifyAdded( result );
+		}
+	}
+	
+	public void notifyRefresh(Result renamed){
+		for(int i=0;i<consumers.size();i++){
+			consumers.get(i).notifyRefresh(renamed);
 		}
 	}
 	

@@ -15,6 +15,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -35,17 +36,25 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
+import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Callback;
 import javafx.util.Duration;
+import javafx.util.StringConverter;
+import projects.xanthogenomes.tools.LoadAndViewClassesTool;
 import de.jstacs.fx.Application;
+import de.jstacs.fx.LoadSaveDialogs;
 import de.jstacs.fx.renderers.results.ResultRenderer;
 import de.jstacs.fx.renderers.results.ResultRendererLibrary;
 import de.jstacs.fx.repository.ResultRepository.ResultConsumer;
+import de.jstacs.parameters.SimpleParameter.IllegalValueException;
 import de.jstacs.results.CategoricalResult;
 import de.jstacs.results.Result;
 import de.jstacs.results.ResultSet;
@@ -117,7 +126,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 			@Override
 			public ObservableValue<Label> call( CellDataFeatures<Result, Label> arg0 ) {
 				//return new ReadOnlyStringWrapper( arg0.getValue().getValue().getComment() );
-				Label lab = new Label(arg0.getValue().getValue().getName() );
+				Label lab = new Label(arg0.getValue().getValue().getName());
 				String comment = arg0.getValue().getValue().getComment();
 				if(comment != null && comment.trim().length() > 0){
 					Tooltip tt = new Tooltip(comment);
@@ -156,10 +165,97 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 
 					});
 				}
-				
-				return new ReadOnlyObjectWrapper<Label>(lab);
+				//return new ReadOnlyObjectWrapper<Label>(lab);
+				SimpleObjectProperty<Label> prop = new SimpleObjectProperty<Label>(lab);
+				return prop;
 			}
 		} );
+		
+		
+		
+		
+		Callback<TreeTableColumn<Result, Label>, TreeTableCell<Result, Label>> cellFactory = (TreeTableColumn<Result,Label> p) -> new TreeTableCell<Result,Label>(){
+			 private TextField textField;
+			 
+			@Override
+	        public void startEdit() {
+	            if (!isEmpty()) {
+	                super.startEdit();
+	                createTextField();
+	                setText(null);
+	                setGraphic(textField);
+	                textField.selectAll();
+	            }
+	        }
+	 
+	        @Override
+	        public void cancelEdit() {
+	            super.cancelEdit();
+	 
+	           // setText( getItem().getText() );
+	            setGraphic(getItem());
+	        }
+	 
+	        @Override
+	        public void updateItem(Label item, boolean empty) {
+	            super.updateItem(item, empty);
+	 
+	            if (empty) {
+	                setText(null);
+	                setGraphic(item);
+	            } else {
+	                if (isEditing()) {
+	                    if (textField != null) {
+	                        textField.setText(getString());
+	                    }
+	                    setText(null);
+	                    setGraphic(textField);
+	                } else {
+	                    //setText(getString());
+	                    setGraphic(item);
+	                }
+	            }
+	        }
+	 
+	        private void createTextField() {
+	            textField = new TextField(getString());
+	            textField.setMinWidth(this.getWidth() - this.getGraphicTextGap()* 2);
+	            textField.setOnAction(new EventHandler<ActionEvent>() {
+					
+					@Override
+					public void handle( ActionEvent event ) {
+						commitEdit(new Label(textField.getText()));			
+					}
+				});
+	           /* textField.focusedProperty().addListener(
+	                (ObservableValue<? extends Boolean> arg0, 
+	                Boolean arg1, Boolean arg2) -> {
+	                    if (!arg2) {
+	                        commitEdit(new Label(textField.getText()));
+	                    }
+	            });*/
+	        }
+	 
+	        private String getString() {
+	            return getItem() == null ? "" : getItem().getText();
+	        }
+			
+        };
+		
+            
+            
+            
+		nameColumn.setCellFactory( cellFactory  );
+		nameColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Result,Label>>() {
+
+			@Override
+			public void handle(CellEditEvent<Result, Label> event) {
+				event.getRowValue().getValue().rename(event.getNewValue().getText());
+				ResultRepository.getInstance().notifyRefresh(event.getRowValue().getValue());
+			}
+			
+		});
+		nameColumn.setEditable(true);
 		
 		
 		/*TreeTableColumn<Result, Label> commentColumn = new TreeTableColumn<Result, Label>("Comment");
@@ -254,12 +350,8 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 								}
 								
 								String name = Arrays.toString( ft ).replaceAll( "(\\[|\\])", "" ).toUpperCase();
-								
-								FileChooser fc = new FileChooser();
 
-								fc.getExtensionFilters().add( new FileChooser.ExtensionFilter( name, ft ) );
-								
-								File f = fc.showSaveDialog( Application.mainWindow );
+								File f = LoadSaveDialogs.showSaveDialog(Application.mainWindow, res.getName(), name, ft);
 								if(f == null){
 									return;
 								}else{
@@ -339,7 +431,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		
 		
 		
-		TreeTableColumn<Result, Button> restartColumn = new TreeTableColumn<Result, Button>("Restart");
+		TreeTableColumn<Result, Button> restartColumn = new TreeTableColumn<Result, Button>("Parameters");
 		restartColumn.setCellValueFactory( new Callback<TreeTableColumn.CellDataFeatures<Result,Button>, ObservableValue<Button>>() {
 
 			@Override
@@ -347,7 +439,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 
 				if(arg0.getValue().getParent() == root && arg0.getValue().getValue() instanceof ToolResult){
 
-					Button btn = new Button( "Restart" );
+					Button btn = new Button( "Restore" );
 					btn.setOnAction( new EventHandler<ActionEvent>() {
 
 						@Override
@@ -418,6 +510,8 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 			}
 			
 		} );
+		
+		ttv.setEditable(true);
 		
 		//ttv.setColumnResizePolicy( TreeTableView.CONSTRAINED_RESIZE_POLICY );
 		
@@ -501,6 +595,12 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 	public void notifyRemoved( Result removed ) {
 		removeResult(removed);		
 	}
+
+	@Override
+	public void notifyRefresh(Result renamed) {
+		//TODO FIXME if renaming possible somewhere else!!!
+	}
+	
 	
 	
 }
