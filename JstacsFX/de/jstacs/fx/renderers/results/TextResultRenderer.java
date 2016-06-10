@@ -5,13 +5,30 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.ClipboardContentBuilder;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import de.jstacs.io.ArrayHandler;
 import de.jstacs.parameters.FileParameter.FileRepresentation;
 import de.jstacs.results.TextResult;
 
@@ -175,6 +192,45 @@ public class TextResultRenderer implements ResultRenderer<TextResult> {
 				TableView<Object[]> tv = new TableView<>();
 				tv.getColumns().addAll( cols );
 				tv.setItems( FXCollections.observableArrayList( content ) );
+				
+				
+				tv.getSelectionModel().selectionModeProperty().set(SelectionMode.MULTIPLE);
+				
+				tv.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+					@Override
+					public void handle(KeyEvent event) {
+						KeyCodeCombination copyKeyCodeCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_ANY);
+						if(copyKeyCodeCombination.match(event)){
+							ObservableList<Integer> sel = tv.getSelectionModel().getSelectedIndices();
+							Set<Integer> set = new HashSet<>(sel);
+							List<Integer> sorted = new ArrayList<>(set); 
+							Collections.sort(sorted);
+							StringBuffer sb = new StringBuffer();
+							for(int i=0;i<sorted.size();i++){
+								Object[] items = tv.getItems().get(sorted.get(i));
+								for(int j=0;j<items.length;j++){
+									sb.append(items[j]);
+									if(j<items.length-1){
+										sb.append("\t");
+									}
+								}
+								sb.append("\n");
+							}
+							
+							
+							final ClipboardContent clipboardContent = new ClipboardContent();
+							clipboardContent.putString(sb.toString());
+
+							Clipboard.getSystemClipboard().setContent(clipboardContent);
+							
+						}
+						
+					}
+					
+				});
+				
+				
 
 				return tv;
 			}
@@ -184,6 +240,35 @@ public class TextResultRenderer implements ResultRenderer<TextResult> {
 		ListView<String> lv = new ListView<>();
 		ObservableList<String> items =FXCollections.observableArrayList ( result.getValue().getContent().split( "\n" ) );
 		lv.setItems( items );
+		lv.getSelectionModel().selectionModeProperty().set(SelectionMode.MULTIPLE);
+		
+		lv.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+			@Override
+			public void handle(KeyEvent event) {
+				KeyCodeCombination copyKeyCodeCombination = new KeyCodeCombination(KeyCode.C, KeyCombination.SHORTCUT_ANY);
+				if(copyKeyCodeCombination.match(event)){
+					ObservableList<Integer> sel = lv.getSelectionModel().getSelectedIndices();
+					Set<Integer> set = new HashSet<>(sel);
+					List<Integer> sorted = new ArrayList<>(set); 
+					Collections.sort(sorted);
+					StringBuffer sb = new StringBuffer();
+					for(int i=0;i<sorted.size();i++){
+						sb.append(lv.getItems().get(sorted.get(i)));
+						sb.append("\n");
+					}
+					
+					
+					final ClipboardContent clipboardContent = new ClipboardContent();
+					clipboardContent.putString(sb.toString());
+
+					Clipboard.getSystemClipboard().setContent(clipboardContent);
+					
+				}
+				
+			}
+			
+		});
 
 		/*TextArea ta = new TextArea();
 		ta.setEditable( false );
@@ -198,6 +283,7 @@ public class TextResultRenderer implements ResultRenderer<TextResult> {
 		return pane;*/
 
 		return lv;
+
 
 	}
 
