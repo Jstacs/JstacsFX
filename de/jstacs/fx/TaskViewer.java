@@ -87,24 +87,26 @@ public class TaskViewer extends Stage {
 
 			@Override
 			public ObservableValue<Button> call( CellDataFeatures<Task<ResultSetResult>, Button> arg0 ) {
+				if(!arg0.getValue().isRunning()){//TODO FIXME implement true cancel for running Tools
+					Button btn = new Button( "Cancel" );
+					btn.setOnAction( new EventHandler<ActionEvent>() {
 
-				Button btn = new Button( "Cancel" );
-				btn.setOnAction( new EventHandler<ActionEvent>() {
+						@Override
+						public void handle( ActionEvent arg1 ) {
+							//System.out.println("cancelling "+arg0.getValue().getValue());
 
-					@Override
-					public void handle( ActionEvent arg1 ) {
-						System.out.println("cancelling "+arg0.getValue().getValue());
-						
-						if(arg0.getValue().isRunning()){
-							arg0.getValue().cancel();	
+							if(arg0.getValue().isRunning()){
+								arg0.getValue().cancel();	
+							}
+							enqueued.remove( arg0.getValue() );
+							nameMap.remove( arg0.getValue() );
+
 						}
-						enqueued.remove( arg0.getValue() );
-						nameMap.remove( arg0.getValue() );
-
-					}
-				} );
-				return new ReadOnlyObjectWrapper<Button>( btn );
-				
+					} );
+					return new ReadOnlyObjectWrapper<Button>( btn );
+				}else{
+					return new ReadOnlyObjectWrapper<Button>(null);
+				}
 
 			}
 			
@@ -119,7 +121,6 @@ public class TaskViewer extends Stage {
 		//table.setColumnResizePolicy( TableView.UNCONSTRAINED_RESIZE_POLICY );
 		table.setColumnResizePolicy( TableView.CONSTRAINED_RESIZE_POLICY );
 		table.setItems( enqueued );
-		
 		
 		border.setCenter( table );
 		

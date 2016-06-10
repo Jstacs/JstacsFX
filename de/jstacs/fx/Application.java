@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javafx.animation.Transition;
 import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -25,7 +28,9 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
@@ -36,6 +41,8 @@ import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TabPane.TabClosingPolicy;
 import javafx.scene.control.TitledPane;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -116,6 +123,16 @@ public class Application {
 		 */
 		public TextFlow getTextFlow(){
 			return flow;
+		}
+		
+		public synchronized void erase(){
+			Platform.runLater( new Runnable() {
+				@Override
+				public void run() {
+					flow.getChildren().clear();
+					log = new StringBuffer();
+				}
+			} );
 		}
 		
 		@Override
@@ -279,7 +296,7 @@ public class Application {
 	public Application(String title, JstacsTool... tools){
 		this.title = title;
 		this.tools = tools;
-		enqueuedJobs = FXCollections.observableArrayList();
+		enqueuedJobs = FXCollections.<Task<ResultSetResult>>observableArrayList(e -> new Observable[] {e.stateProperty(),e.exceptionProperty(),e.onRunningProperty(),e.onSucceededProperty(),e.onFailedProperty()});
 		nameMap = new HashMap<>();
 		this.tasks = new TaskViewer( enqueuedJobs, nameMap );
 		this.paneMap = new HashMap<>();
@@ -672,14 +689,14 @@ public class Application {
 
 			@Override
 			public void handle( ActionEvent arg0 ) {
-				FileChooser fc = new FileChooser();
-
-				fc.getExtensionFilters().add( new FileChooser.ExtensionFilter( "JST", "*.jst" ) );
 				
-				File f = fc.showSaveDialog( mainWindow );
+				
+				File f = LoadSaveDialogs.showSaveDialog(mainWindow, "workspace", "JST", "*.jst");
+				
 				if(f == null){
 					return;
 				}else{
+					
 					StringBuffer sb = ResultRepository.getInstance().storeResultsToXML();
 					try {
 						FileManager.writeFile( f, Compression.zip(sb.toString()) );
@@ -697,11 +714,9 @@ public class Application {
 			
 			@Override
 			public void handle( ActionEvent arg0 ) {
-				FileChooser fc = new FileChooser();
-
-				fc.getExtensionFilters().add( new FileChooser.ExtensionFilter( "JST", "*.jst" ) );
 				
-				File f = fc.showOpenDialog( mainWindow );
+				File f = LoadSaveDialogs.showLoadDialog(mainWindow, "JST", "*.jst");
+				
 				if(f == null){
 					return;
 				}else{
@@ -898,11 +913,10 @@ public class Application {
 
 			@Override
 			public void handle(ActionEvent event) {
-				FileChooser fc = new FileChooser();
-
-				fc.getExtensionFilters().add( new FileChooser.ExtensionFilter( "TXT", "*.txt" ) );
-				fc.setInitialFileName("protocol");
-				File f = fc.showSaveDialog( primaryStage );
+				
+				
+				File f = LoadSaveDialogs.showSaveDialog(primaryStage, "protocol", "TXT", "*.txt");
+				
 				if(f == null){
 					return;
 				}else{
@@ -916,6 +930,38 @@ public class Application {
 			
 		});
 		hb.getChildren().add(saveProt);
+		
+		Region spacer = new Region();
+		spacer.setMinWidth(100);
+	    //HBox.setHgrow(spacer, Priority.ALWAYS);
+		hb.getChildren().add(spacer);
+	    
+	    
+		Button eraseProt = new Button("Erase protocol...");
+		eraseProt.setOnAction(new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent event) {
+				Alert alert = new Alert( AlertType.CONFIRMATION );
+				alert.setWidth( 300 );
+				alert.setTitle( "Erase procotol?" );
+				alert.setHeaderText( "Do you really want to erase the protocol." );
+				alert.setContentText( "This cannot be undone, so you might want to save your protocol to disk beforehand." );
+				ButtonType cancel = new ButtonType( "Cancel", ButtonData.CANCEL_CLOSE );
+				ButtonType ok = new ButtonType( "Erase", ButtonData.OK_DONE );
+				alert.getButtonTypes().setAll( cancel, ok );
+				
+				Optional<ButtonType> result = alert.showAndWait();
+				
+				if(result.get() == ok){
+					protocol.erase();
+					messageOverlay.displayMessage("Protocol erased.", Level.INFO);
+				}
+			}
+			
+		});
+		hb.getChildren().add(eraseProt);
+		
 		
 		BorderPane protBP = new BorderPane();
 		protBP.setCenter(protSP);
@@ -1016,5 +1062,7 @@ public class Application {
 		
 		
 	}
+	
+	
 	
 }
