@@ -31,11 +31,11 @@ public abstract class AbstractParameterRenderer<T extends Parameter> implements 
 	@Override
 	public void render( final T parameter, Pane parent, ToolReady ready ) {
 		
-		Label name = new Label( parameter.getName() );
+		Label name = new Label( parameter.getName()+(parameter.isRequired() ? "" : " (optional)") );
 		parent.getChildren().add( name );
 		name.getStyleClass().add( "name" );
 		
-		Label comment = new Label( parameter.getComment()+(parameter.isRequired() ? "" : " (optional)") );
+		Label comment = new Label( parameter.getComment() );
 		comment.setWrapText( true );
 		comment.getStyleClass().add( "comment" );
 		

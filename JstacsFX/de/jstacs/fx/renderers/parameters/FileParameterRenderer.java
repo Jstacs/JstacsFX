@@ -2,12 +2,14 @@ package de.jstacs.fx.renderers.parameters;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
@@ -17,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import de.jstacs.fx.Application;
+import de.jstacs.fx.LoadSaveDialogs;
 import de.jstacs.fx.Application.ToolReady;
 import de.jstacs.fx.repository.ResultRepository;
 import de.jstacs.fx.repository.ResultRepository.ResultConsumer;
@@ -52,15 +55,17 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		
 		public FileRepresentation getFileRepresentation(){
 			if(frint2 == null){
-				if(res instanceof TextResult){
-					frint2 = ((TextResult)res).getValue();
-				}else{
-					ResultSaver saver = ResultSaverLibrary.getSaver( res.getClass() );
-					if(saver != null){
-						StringBuffer sb = new StringBuffer();
-						saver.writeOutput( res, sb );
-						frint2 = new FileRepresentation( "", sb.toString() );
-						frint2.setExtension( saver.getFileExtensions( res )[0] );
+				if(res !=null){
+					if(res instanceof TextResult){
+						frint2 = ((TextResult)res).getValue();
+					}else{
+						ResultSaver saver = ResultSaverLibrary.getSaver( res.getClass() );
+						if(saver != null){
+							StringBuffer sb = new StringBuffer();
+							saver.writeOutput( res, sb );
+							frint2 = new FileRepresentation( "", sb.toString() );
+							frint2.setExtension( saver.getFileExtensions( res )[0] );
+						}
 					}
 				}
 			}
@@ -68,11 +73,15 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		}
 		
 		public String toString(){
-			return res.getName();
+			if(res == null){
+				return "--- None ---";
+			}else{
+				return res.getName();
+			}
 		}
 		
 		public boolean equals(Object other){
-			if(other instanceof ResultContainer){
+			if(other instanceof ResultContainer && res != null ){
 				return res.equals( ((ResultContainer)other).res );
 			}else{
 				return false;
@@ -183,6 +192,15 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 			
 			box.getItems().removeAll( li );
 		}
+
+		@Override
+		public void notifyRefresh(Result renamed) {
+			if(box.getItems().size() > 0){
+				box.getItems().set(0, box.getItems().get(0));
+			}
+		}
+		
+		
 		
 	}
 	
@@ -209,16 +227,13 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 	 */
 	protected void loadFromFile(FileParameter parameter, ChoiceBox<ResultContainer> box, Label error, ToolReady ready){
 		
-		FileChooser fc = new FileChooser();
-		
 		String[] ft = parameter.getAcceptedMimeType().split( "\\," );
 		for(int i=0;i<ft.length;i++){
 			ft[i] = "*."+ft[i];
 		}
 		
-		fc.getExtensionFilters().add( new FileChooser.ExtensionFilter( parameter.getAcceptedMimeType().toUpperCase(), ft ) );
+		File f = LoadSaveDialogs.showLoadDialog(Application.mainWindow, parameter.getAcceptedMimeType().toUpperCase(), ft);
 		
-		File f = fc.showOpenDialog( Application.mainWindow );
 		if(f == null){
 			return;
 		}
@@ -255,7 +270,10 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		
 		
 		final ChoiceBox<ResultContainer> box = new ChoiceBox<ResultContainer>();
-		box.setItems( FXCollections.observableArrayList( items ) );
+		
+		ObservableList<ResultContainer> ilist= FXCollections.observableArrayList( items );
+		ilist.add(0, new ResultContainer(null));
+		box.setItems( ilist );
 		parent.getChildren().add( box );
 		
 		box.getSelectionModel().selectedItemProperty().addListener( new ChangeListener<ResultContainer>(){
