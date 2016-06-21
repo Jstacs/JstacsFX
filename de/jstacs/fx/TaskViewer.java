@@ -8,6 +8,7 @@ import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker.State;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -73,40 +74,43 @@ public class TaskViewer extends Stage {
 		} );
 		
 		
-		TableColumn<Task<ResultSetResult>, String> stateCol = new TableColumn<>("State");
-		stateCol.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Task<ResultSetResult>,String>, ObservableValue<String>>() {
+		TableColumn<Task<ResultSetResult>, State> stateCol = new TableColumn<>("State");
+		stateCol.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Task<ResultSetResult>,State>, ObservableValue<State>>() {
 			
 			@Override
-			public ObservableValue<String> call( CellDataFeatures<Task<ResultSetResult>, String> arg0 ) {
-				return new ReadOnlyStringWrapper(arg0.getValue().getState().toString());
+			public ObservableValue<State> call( CellDataFeatures<Task<ResultSetResult>, State> arg0 ) {
+				//return new ReadOnlyStringWrapper(arg0.getValue().getState().toString());
+				return arg0.getValue().stateProperty();
 			}
 		} );
+		
+		
 		
 		TableColumn<Task<ResultSetResult>, Button> removeColumn = new TableColumn<>("Cancel");
 		removeColumn.setCellValueFactory( new Callback<TableColumn.CellDataFeatures<Task<ResultSetResult>, Button>, ObservableValue<Button>>() {
 
 			@Override
 			public ObservableValue<Button> call( CellDataFeatures<Task<ResultSetResult>, Button> arg0 ) {
-				if(!arg0.getValue().isRunning()){//TODO FIXME implement true cancel for running Tools
-					Button btn = new Button( "Cancel" );
-					btn.setOnAction( new EventHandler<ActionEvent>() {
+				Button btn = new Button( "Cancel" );
+				btn.setOnAction( new EventHandler<ActionEvent>() {
 
-						@Override
-						public void handle( ActionEvent arg1 ) {
-							//System.out.println("cancelling "+arg0.getValue().getValue());
+					@Override
+					public void handle( ActionEvent arg1 ) {
+						//System.out.println("cancelling "+arg0.getValue().getValue());
 
-							if(arg0.getValue().isRunning()){
-								arg0.getValue().cancel();	
-							}
-							enqueued.remove( arg0.getValue() );
-							nameMap.remove( arg0.getValue() );
-
+						if(arg0.getValue().isRunning()){
+							arg0.getValue().cancel();	
 						}
-					} );
-					return new ReadOnlyObjectWrapper<Button>( btn );
-				}else{
-					return new ReadOnlyObjectWrapper<Button>(null);
-				}
+						enqueued.remove( arg0.getValue() );
+						nameMap.remove( arg0.getValue() );
+
+					}
+				} );
+
+				btn.disableProperty().bind(arg0.getValue().runningProperty());
+				btn.visibleProperty().bind(arg0.getValue().runningProperty().not());
+				
+				return new ReadOnlyObjectWrapper<Button>( btn );
 
 			}
 			
