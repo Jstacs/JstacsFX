@@ -195,7 +195,7 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 
 		@Override
 		public void notifyRefresh(Result renamed) {
-			if(box.getItems().size() > 0){
+			if(!box.getItems().isEmpty()){
 				box.getItems().set(0, box.getItems().get(0));
 			}
 		}
