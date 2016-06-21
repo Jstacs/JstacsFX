@@ -20,6 +20,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker.State;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
@@ -627,7 +628,7 @@ public class Application {
 				int num = Math.max( 0, arg0.getList().size()-1);
 				String job = num == 1 ? "job" : "jobs";
 				enqueued.setText( "("+num+" "+job+" pending)" );
-				if(arg0.getList().size() > 0 && !arg0.getList().get( 0 ).isRunning()){
+				if(arg0.getList().size() > 0 && arg0.getList().get( 0 ).getState() == State.READY){
 					Thread thread = new Thread(arg0.getList().get( 0 ));
 					thread.setDaemon( true );
 					thread.start();
