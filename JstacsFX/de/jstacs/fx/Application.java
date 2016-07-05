@@ -278,6 +278,7 @@ public class Application {
 	private HashMap<Task<ResultSetResult>,Pair<String,Date>> nameMap;
 	
 	private String title;
+	private boolean showStackTraceInProtocol;
 	private JstacsTool[] tools;
 	private SplitPane parameterMain;
 	private ProgressBar progressBar;
@@ -288,6 +289,7 @@ public class Application {
 
 	private HashMap<String,TitledPane> paneMap;
 	
+	
 	/**
 	 * Creates a new {@link Application} with the provided title in the main window for
 	 * the given {@link JstacsTool}s.
@@ -295,6 +297,17 @@ public class Application {
 	 * @param tools the tools used in this application
 	 */
 	public Application(String title, JstacsTool... tools){
+		this(title,true,tools);
+	}
+	
+	/**
+	 * Creates a new {@link Application} with the provided title in the main window for
+	 * the given {@link JstacsTool}s.
+	 * @param title the title of the main window
+	 * @param showStackTraceInProtocol if stack traces of {@link Exception}s that are thrown by {@link JstacsTool} show be shown as warnings in the protocol
+	 * @param tools the tools used in this application
+	 */
+	public Application(String title, boolean showStackTraceInProtocol, JstacsTool... tools){
 		this.title = title;
 		this.tools = tools;
 		enqueuedJobs = FXCollections.<Task<ResultSetResult>>observableArrayList(e -> new Observable[] {e.stateProperty(),e.exceptionProperty(),e.onRunningProperty(),e.onSucceededProperty(),e.onFailedProperty()});
@@ -391,7 +404,9 @@ public class Application {
 							StringWriter sw = new StringWriter();
 							e.printStackTrace( new PrintWriter( sw ) );
 							protocol.appendHeading( "Tool "+tool.getToolName()+" failed.\nError message: "+e.getMessage()+"\n\n" );
-							protocol.appendWarning( sw.toString()+"\n" );
+							if(showStackTraceInProtocol){
+								protocol.appendWarning( sw.toString()+"\n" );
+							}
 							protocol.append("\n######################################################\n\n\n");
 							throw e;
 							//return null;
