@@ -349,9 +349,9 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 									saver.writeOutput( res, f );
 								}
 							}else{
-								DirectoryChooser dir = new DirectoryChooser();
+								//DirectoryChooser dir = new DirectoryChooser();
 								
-								File directory = dir.showDialog( Application.mainWindow );
+								File directory = LoadSaveDialogs.showDirectoryDialog(Application.mainWindow);//dir.showDialog( Application.mainWindow );
 								
 								if(directory == null){
 									return;
