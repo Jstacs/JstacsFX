@@ -311,6 +311,7 @@ public class Application {
 		nameMap = new HashMap<>();
 		this.tasks = new TaskViewer( enqueuedJobs, nameMap );
 		this.paneMap = new HashMap<>();
+		this.showStackTraceInProtocol = showStackTraceInProtocol;
 	}
 	
 	
@@ -400,7 +401,8 @@ public class Application {
 							e.printStackTrace();
 							StringWriter sw = new StringWriter();
 							e.printStackTrace( new PrintWriter( sw ) );
-							protocol.appendHeading( "Tool "+tool.getToolName()+" failed.\nError message: "+e.getMessage()+"\n\n" );
+							protocol.appendHeading( "Tool "+tool.getToolName()+" failed.\nError message:\n" );
+							protocol.appendWarning(e.getMessage()+"\n\n");
 							if(showStackTraceInProtocol){
 								protocol.appendWarning( sw.toString()+"\n" );
 							}
@@ -438,7 +440,18 @@ public class Application {
 						nameMap.remove( arg0.getSource() );
 						//enqueued.setText( "("+Math.max( 0, enqueuedJobs.size()-1)+" Jobs pending)" );
 						if( arg0.getEventType().equals( WorkerStateEvent.WORKER_STATE_FAILED ) ){
-							messageOverlay.displayMessage( tool.getToolName()+" failed; see protocol for details", Level.WARNING );
+							
+							String msg = "";
+							Throwable exception = arg0.getSource().getException();
+							if(exception != null){
+								msg = exception.getMessage();
+								if(msg.length() > 80){
+									msg = msg.substring(0, Math.max(80, msg.indexOf(" ",80) ) )+"...";
+								}
+								msg = msg+"\n";
+							}
+							
+							messageOverlay.displayMessage( tool.getToolName()+" failed:\n"+msg+"See protocol for details", Level.WARNING );
 						}else if( arg0.getEventType().equals( WorkerStateEvent.WORKER_STATE_CANCELLED ) ){
 							messageOverlay.displayMessage( tool.getToolName()+" canceled; see protocol for details", Level.INFO );
 						}else{
