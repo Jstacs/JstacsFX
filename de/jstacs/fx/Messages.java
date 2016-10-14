@@ -84,7 +84,7 @@ public class Messages {
 						box.setOpacity( 0.5 );
 
 						FadeTransition fade = new FadeTransition( Duration.millis( 1500 ), box );
-						fade.setDelay( Duration.millis( 1500 ) );
+						fade.setDelay( Duration.millis( 2500 ) );
 						fade.setAutoReverse( false );
 						fade.setFromValue( 0.5 );
 						fade.setToValue( 0.0 );
