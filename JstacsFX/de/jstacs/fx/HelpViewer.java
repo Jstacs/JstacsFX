@@ -157,10 +157,12 @@ public class HelpViewer extends Stage {
 		}
 		
 		StringBuffer sb = new StringBuffer();
+		sb.append("<div style=\"font-family:sans-serif;\">");
 		for(int i=0;i<lines.length;i++){
 			sb.append( lines[i] );
 			sb.append( "\n" );
 		}
+		sb.append("</div>");
 		return sb.toString();
 	}
 	
