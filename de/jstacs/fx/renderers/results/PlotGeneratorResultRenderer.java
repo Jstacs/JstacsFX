@@ -45,10 +45,10 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 
 		try{
 			
-			WritableImage img = null;
+			WritableImage img2 = null;
 			
 			if(result.isStatic() && map.containsKey( result )){
-				img = map.get( result );
+				img2 = map.get( result );
 			}else{
 			
 				RasterizedAdaptor ra = new RasterizedAdaptor( "png" );
@@ -57,12 +57,14 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 
 				BufferedImage im = ra.getImage();
 
-				img = SwingFXUtils.toFXImage( im, null );
+				img2 = SwingFXUtils.toFXImage( im, null );
 				
 				if(result.isStatic()){
-					map.put( result, img );
+					map.put( result, img2 );
 				}
 			}
+			
+			final WritableImage img = img2;
 			
 			ImageView view = new ImageView( img );
 
@@ -97,24 +99,50 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 					view.setFitHeight(-1);
 				}
 			} );
+			
+			double ratw = (parent.getWidth()-5)/img.getWidth();
+			double rath = (parent.getHeight() - bar.getHeight()-5)/img.getHeight();
+			final double rat = Math.min(ratw, rath );
+			
 			Button fit = new Button( "Fit" );
 			fit.setOnAction( new EventHandler<ActionEvent>() {
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
-					view.setFitWidth( parent.getWidth()-5 );
-					view.setFitHeight(parent.getHeight() - bar.getHeight()-5);
+					view.setFitWidth( img.getWidth()*rat );
+					view.setFitHeight( img.getHeight()*rat );
 				}
 			} );
 			
-			bar.getChildren().addAll( plus, minus, fit );
+			Button fitw = new Button( "Fit width" );
+			fitw.setOnAction( new EventHandler<ActionEvent>() {
+				
+				@Override
+				public void handle( ActionEvent arg0 ) {
+					view.setFitWidth( parent.getWidth()-5 - (rath<ratw ? 15 : 0) );
+					view.setFitHeight( -1 );
+				}
+			} );
+			
+			Button fith = new Button( "Fit height" );
+			fith.setOnAction( new EventHandler<ActionEvent>() {
+				
+				@Override
+				public void handle( ActionEvent arg0 ) {
+					view.setFitWidth( -1 );
+					view.setFitHeight(parent.getHeight() - bar.getHeight()-5 - (ratw<rath ? 15 : 0));
+				}
+			} );
+			
+			
+			bar.getChildren().addAll( plus, minus, fit, fitw, fith );
 			
 			BorderPane both = new BorderPane();
 			both.setTop( bar );
 			both.setCenter( pane );
 		
-			view.setFitWidth( parent.getWidth()-5 );
-			view.setFitHeight(parent.getHeight() - 30);
+			view.setFitWidth( img.getWidth()*rat );
+			view.setFitHeight( img.getHeight()*rat );
 			
 			return both;
 		}catch(Exception e){
