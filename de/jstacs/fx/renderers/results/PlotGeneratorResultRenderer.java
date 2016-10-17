@@ -100,15 +100,16 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				}
 			} );
 			
-			double ratw = (parent.getWidth()-5)/img.getWidth();
-			double rath = (parent.getHeight() - bar.getHeight()-5)/img.getHeight();
-			final double rat = Math.min(ratw, rath );
+			
 			
 			Button fit = new Button( "Fit" );
 			fit.setOnAction( new EventHandler<ActionEvent>() {
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
+					double ratw = (parent.getWidth()-5)/img.getWidth();
+					double rath = (parent.getHeight() - bar.getHeight()-5)/img.getHeight();
+					double rat = Math.min(ratw, rath );
 					view.setFitWidth( img.getWidth()*rat );
 					view.setFitHeight( img.getHeight()*rat );
 				}
@@ -119,6 +120,8 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
+					double ratw = (parent.getWidth()-5)/img.getWidth();
+					double rath = (parent.getHeight() - bar.getHeight()-5)/img.getHeight();
 					view.setFitWidth( parent.getWidth()-5 - (rath<ratw ? 15 : 0) );
 					view.setFitHeight( -1 );
 				}
@@ -129,6 +132,8 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
+					double ratw = (parent.getWidth()-5)/img.getWidth();
+					double rath = (parent.getHeight() - bar.getHeight()-5)/img.getHeight();
 					view.setFitWidth( -1 );
 					view.setFitHeight(parent.getHeight() - bar.getHeight()-5 - (ratw<rath ? 15 : 0));
 				}
@@ -141,6 +146,10 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 			both.setTop( bar );
 			both.setCenter( pane );
 		
+			double ratw = (parent.getWidth()-5)/img.getWidth();
+			double rath = (parent.getHeight() -30)/img.getHeight();
+			double rat = Math.min(ratw, rath );
+			
 			view.setFitWidth( img.getWidth()*rat );
 			view.setFitHeight( img.getHeight()*rat );
 			
