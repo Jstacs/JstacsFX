@@ -123,6 +123,9 @@ public class Application {
 			return flow;
 		}
 		
+		/**
+		 * Erases the contents of the protocol, including the background log.
+		 */
 		public synchronized void erase(){
 			Platform.runLater( new Runnable() {
 				@Override

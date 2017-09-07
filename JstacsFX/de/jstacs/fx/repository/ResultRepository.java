@@ -52,6 +52,11 @@ public class ResultRepository {
 		 */
 		public void notifyRemoved(Result removed);
 		
+		/**
+		 * Notifies the {@link ResultConsumer} that a {@link Result} has been modified in the {@link ResultRepository}
+		 * and the view should be refreshed.
+		 * @param renamed the {@link Result} renamed
+		 */
 		public void notifyRefresh(Result renamed);
 		
 	}
@@ -93,24 +98,19 @@ public class ResultRepository {
 		}
 	}
 	
-	/*public StringBuffer storeContents(){
-		StringBuffer sb = new StringBuffer();
-		XMLParser.appendObjectWithTags( sb, results.toArray( new Result[0] ), "results" );
-		return sb;
-	}*/
-	
-	/*public void loadContents(StringBuffer sb) throws NonParsableException{
-		Result[] res = (Result[])XMLParser.extractObjectForTags( sb, "results" );
-		Collections.addAll( results, res );
-	}*/
-	
-	
 	private void notifyAdd(Result result){
 		for(int i=0;i<consumers.size();i++){
 			consumers.get( i ).notifyAdded( result );
 		}
 	}
 	
+	
+	/**
+	 * Notifies this {@link ResultRepository} that a {@link Result} has been modified 
+	 * and consumers should be notified.
+	 * @param renamed the {@link Result} renamed
+	 * @see ResultConsumer
+	 */
 	public void notifyRefresh(Result renamed){
 		for(int i=0;i<consumers.size();i++){
 			consumers.get(i).notifyRefresh(renamed);
