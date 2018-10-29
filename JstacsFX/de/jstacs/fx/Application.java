@@ -21,6 +21,7 @@ import de.jstacs.results.ResultSetResult;
 import de.jstacs.tools.JstacsTool;
 import de.jstacs.tools.ProgressUpdater;
 import de.jstacs.tools.Protocol;
+import de.jstacs.tools.ToolParameterSet;
 import de.jstacs.tools.ToolResult;
 import de.jstacs.utils.Compression;
 import de.jstacs.utils.Pair;
@@ -318,7 +319,7 @@ public class Application {
 	}
 	
 	
-	private Pane getToolParameters(final JstacsTool tool, ParameterSet parameters2 ){
+	private Pane getToolParameters(final JstacsTool tool, ToolParameterSet parameters2 ){
 		
 		ParameterSetRenderer renderer = new ParameterSetRenderer();
 		
@@ -351,7 +352,7 @@ public class Application {
 					return;
 				}
 				
-				final ParameterSet parameters;
+				final ToolParameterSet parameters;
 				try {
 					parameters = parameters2.clone();
 				} catch (CloneNotSupportedException e1) {
@@ -525,7 +526,7 @@ public class Application {
 			String name = tools[i].getToolName();
 			if(name.equals( tn )){
 				
-				ParameterSet tps = tools[i].getToolParameters();
+				ToolParameterSet tps = tools[i].getToolParameters();
 				//System.out.println(tps);
 				//System.out.println(res.getToolParameters());
 				res.setFromStoredParameters( tps );
