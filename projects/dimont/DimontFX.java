@@ -6,7 +6,7 @@ import projects.dimont.DimontPredictorTool;
 import projects.dimont.DimontTool;
 import projects.dimont.ExtractSequencesTool;
 
-public class Dimont extends javafx.application.Application  {
+public class DimontFX extends javafx.application.Application  {
 
 	
 	public static void main(String[] args) {
