@@ -31,6 +31,7 @@ public class ResultRendererLibrary {
 	 * Registers the given {@link ResultRenderer} for the given {@link Result} subclass.
 	 * @param clazz the class
 	 * @param renderer the renderer
+	 * @param <T> the type of the result
 	 */
 	public static <T extends Result> void register(Class<? extends T> clazz, ResultRenderer<T> renderer){
 		if(map == null){
@@ -46,6 +47,7 @@ public class ResultRendererLibrary {
 	 * a {@link ResultRenderer} registered for a superclass is returned. If such a {@link ResultRenderer} is also
 	 * not found, this method returns <code>null</code>
 	 * @param result the result
+	 * @param <T> the type of the result
 	 * @return the renderer
 	 */
 	public static <T extends Result> ResultRenderer<T> getRenderer(T result){
