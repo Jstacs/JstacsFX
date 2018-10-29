@@ -22,6 +22,7 @@ public class ParameterRendererLibrary {
 		SelectionParameterRenderer.register();
 		SimpleParameterRenderer.register();
 		DataColumnParameterRenderer.register();
+		ParameterSetContainerRenderer.register();
 	}
 	
 	
