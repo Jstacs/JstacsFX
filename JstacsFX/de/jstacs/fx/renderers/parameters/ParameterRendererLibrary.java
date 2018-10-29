@@ -31,6 +31,7 @@ public class ParameterRendererLibrary {
 	 * Registers the given {@link ParameterRenderer} for the given {@link Parameter} subclass.
 	 * @param clazz the class
 	 * @param renderer the renderer
+	 * @param <T> the type of the parameter
 	 */
 	public static <T extends Parameter> void register(Class<T> clazz, ParameterRenderer<T> renderer){
 		//System.out.println("registered "+renderer+" "+clazz.getName());
@@ -46,6 +47,7 @@ public class ParameterRendererLibrary {
 	 * a {@link ParameterRenderer} registered for a superclass is returned. If such a {@link ParameterRenderer} is also
 	 * not found, this method returns <code>null</code>
 	 * @param parameter the parameter
+	 * @param <T> the type of the parameter
 	 * @return the renderer
 	 */
 	public static <T extends Parameter> ParameterRenderer<T> getRenderer(T parameter){
