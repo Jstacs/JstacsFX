@@ -1,0 +1,88 @@
+<project name="publish-jstacs" basedir=".">
+	
+	<!--
+		You should set the build dir, i.e. the directory where the resulting zips and tars are created
+		using the ant command line argument -Dbuilddir="/my/funny/dir/"
+		<property name="builddir" value="/Users/dev/Documents/jstacs_downloads/" />
+	-->
+	
+	<property name="version" value="1.0" />
+	<property name="builddir" value="/Users/dev/Documents/jstacs_downloads/" />
+	<property name="cp" value="/Users/dev/Documents/workspace3/Jstacs_svn/bin:../Jstacs_svn/lib/numericalMethods.jar:../Jstacs_svn/lib/RClient-0.6.7.jar:../Jstacs_svn/lib/biojava-live.jar:../Jstacs_svn/lib/bytecode-1.9.0.jar:../Jstacs_svn/lib/core-1.9.0.jar:../Jstacs_svn/lib/xml-commons/pdf-transcoder.jar:../Jstacs_svn/lib/xml-commons/xmlgraphics-commons-1.5.jar:../Jstacs_svn/lib/Jama-1.0.3.jar:../Jstacs_svn/lib/xml-commons/batik-transcoder.jar:../Jstacs_svn/lib/colt.jar:../Jstacs_svn/lib/ssj.jar:../Jstacs_svn/lib/xml-commons/batik-dom.jar:../Jstacs_svn/lib/xml-commons/batik-svggen.jar:../Jstacs_svn/lib/xml-commons/batik-svg-dom.jar:../Jstacs_svn/lib/xml-commons/batik-awt-util.jar:../Jstacs_svn/lib/xml-commons/batik-util.jar" />
+	
+	<target name="javadoc">
+		<javadoc access="protected" author="true" classpath="${cp}"
+				destdir="${builddir}/jstacsfx-api" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false"
+				additionalparam="-encoding UTF-8 "
+				packagenames="de.jstacs.*"
+				doctitle="JstacsFX ${version} API Specification"
+				source="1.8" sourcepath="." splitindex="true" use="true" version="true" verbose="false">
+			<link href="http://www.biojava.org/docs/api1.9.1/" />
+			<link href="http://docs.oracle.com/javase/7/docs/api/"/>
+			<link href="http://rforge.net/org/doc/"/>
+			<link href="http://www-sfb288.math.tu-berlin.de/~jtem/numericalMethods/api/"/>
+			<link href="http://math.nist.gov/javanumerics/jama/doc/"/>
+			<link href="https://xmlgraphics.apache.org/batik/javadoc/"/>
+			<link href="https://docs.oracle.com/javafx/2/api/"/>
+			<link href="http://www.jstacs.de/api/"/>
+		</javadoc>
+		<zip destfile="${builddir}/jstacsfx-api-${version}.zip">
+			<zipfileset dir="${builddir}" includes="jstacsfx-api/**" />
+			<zipfileset dir="." includes="COPYING.txt" />
+		</zip>
+		<tar destfile="${builddir}/jstacsfx-api-${version}.tar.gz" compression="gzip" longfile="gnu">
+			<tarfileset dir="${builddir}" includes="jstacsfx-api/**" />
+			<tarfileset dir="." includes="COPYING.txt" />
+		</tar>
+		<delete includeemptydirs="true">
+			<fileset dir="${builddir}/jstacsfx-api" />
+		</delete>
+	</target>
+	
+	<target name="buildjar">
+		<mkdir dir="tempbin" />
+		<delete includeemptydirs="true">
+			<fileset dir="tempbin" includes="**/*" />
+		</delete>
+		<javac srcdir="de" 
+		       destdir="tempbin"
+		       classpath="${cp}"
+		       debug="on">
+		</javac>
+		<copy file="de/jstacs/fx/application.css" todir="tempbin/de/jstacs/fx/" />
+		<jar destfile="${builddir}/jstacsfx-${version}.jar">
+			<fileset dir="tempbin" />
+		</jar>
+		<delete includeemptydirs="true">
+			<fileset dir="tempbin" />
+		</delete>
+	</target>
+
+	
+	<target name="bin" depends="buildjar">
+		<zip destfile="${builddir}/jstacsfx-bin-${version}.zip">
+			<zipfileset dir="${builddir}" includes="jstacsfx-${version}.jar" prefix="jstacsfx-bin-${version}" />
+			<zipfileset dir="." includes="COPYING.txt" prefix="jstacsfx-bin-${version}" />
+		</zip>
+		<tar destfile="${builddir}/jstacsfx-bin-${version}.tar.gz" compression="gzip" longfile="gnu">
+			<tarfileset dir="${builddir}" includes="jstacsfx-${version}.jar" prefix="jstacsfx-bin-${version}" />
+			<tarfileset dir="." includes="COPYING.txt" prefix="jstacsfx-bin-${version}" />
+		</tar>
+	</target>
+	
+	<target name="src">
+		<zip destfile="${builddir}/jstacsfx-source-${version}.zip">
+			<zipfileset dir="." includes="de/**,COPYING.txt" prefix="jstacsfx-source-${version}" />
+		</zip>
+		<tar destfile="${builddir}/jstacsfx-source-${version}.tar.gz" compression="gzip" longfile="gnu">
+			<tarfileset dir="." includes="de/**,COPYING.txt" prefix="jstacsfx-source-${version}" />
+		</tar>		
+	</target>
+	
+	<target name="cleanjar" depends="buildjar">
+		<delete file="${builddir}/jstacsfx-${version}.jar" />
+	</target>
+	
+	<target name="all" depends="src,bin,javadoc,cleanjar" />
+	
+</project>
