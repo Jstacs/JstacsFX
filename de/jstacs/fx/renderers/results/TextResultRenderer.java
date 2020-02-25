@@ -94,7 +94,7 @@ public class TextResultRenderer implements ResultRenderer<TextResult> {
 	@Override
 	public Node render( TextResult result, Pane parent ) {
 		
-		if(TextResult.equals( result.getMime(), "xml") || result.getValue().getFilesize() > 20E6){
+		if(TextResult.equals( result.getMime(), "xml") || (result.getValue().getExtension() != null && result.getValue().getExtension().toLowerCase().equals("gz")) || result.getValue().getFilesize() > 20E6){
 			return null;
 		}else if(TextResult.equals(result.getMime(), "bed,gff,gff3,tsv,csv")){
 			
