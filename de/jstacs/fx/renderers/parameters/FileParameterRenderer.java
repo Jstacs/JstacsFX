@@ -2,10 +2,22 @@ package de.jstacs.fx.renderers.parameters;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.jstacs.fx.Application;
+import de.jstacs.fx.Application.ToolReady;
+import de.jstacs.fx.LoadSaveDialogs;
+import de.jstacs.fx.repository.ResultRepository;
+import de.jstacs.fx.repository.ResultRepository.ResultConsumer;
+import de.jstacs.parameters.FileParameter;
+import de.jstacs.parameters.FileParameter.FileRepresentation;
+import de.jstacs.parameters.SimpleParameter.IllegalValueException;
+import de.jstacs.results.Result;
+import de.jstacs.results.ResultSetResult;
+import de.jstacs.results.TextResult;
+import de.jstacs.results.savers.ResultSaver;
+import de.jstacs.results.savers.ResultSaverLibrary;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -17,20 +29,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
-import javafx.stage.FileChooser;
-import de.jstacs.fx.Application;
-import de.jstacs.fx.LoadSaveDialogs;
-import de.jstacs.fx.Application.ToolReady;
-import de.jstacs.fx.repository.ResultRepository;
-import de.jstacs.fx.repository.ResultRepository.ResultConsumer;
-import de.jstacs.parameters.FileParameter;
-import de.jstacs.parameters.FileParameter.FileRepresentation;
-import de.jstacs.parameters.SimpleParameter.IllegalValueException;
-import de.jstacs.results.Result;
-import de.jstacs.results.ResultSetResult;
-import de.jstacs.results.TextResult;
-import de.jstacs.results.savers.ResultSaver;
-import de.jstacs.results.savers.ResultSaverLibrary;
 
 /**
  * Class for rendering a {@link FileParameter} in the JavaFX GUI.
@@ -237,20 +235,20 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		if(f == null){
 			return;
 		}
-		
+
 		FileRepresentation fr = new FileRepresentation(f.getAbsolutePath());
-		TextResult fres = new TextResult( f.getName(), "", fr, parameter.getAcceptedMimeType(), "Loaded from file", parameter.getExtendedType(), false );
-		
+		TextResult fres = new TextResult( f.getName(), "", fr, false, parameter.getAcceptedMimeType(), "Loaded from file", parameter.getExtendedType(), false );
 		try {
-			
 			fres.fill( parameter );
 			//System.out.println("adding");
 			ResultRepository.getInstance().add( fres );
 			//System.out.println("added");
 
-			box.getSelectionModel().select( new ResultContainer( fres ) );
-			//System.out.println("selected: "+box.getSelectionModel().getSelectedIndex());
+			ResultContainer rc = new ResultContainer( fres );
 			
+			box.getSelectionModel().select( rc );
+			
+			//System.out.println("selected: "+box.getSelectionModel().getSelectedIndex());
 		} catch ( IllegalValueException e ) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
