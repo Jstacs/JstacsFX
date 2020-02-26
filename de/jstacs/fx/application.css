@@ -64,6 +64,13 @@
 	-fx-background-radius: 20;
 }
 
+#citationbutton{
+	-fx-font-weight: bold;
+	-fx-padding:0;
+	-fx-border-radius: 20;
+	-fx-background-radius: 20;
+}
+
 #splash{
 	-fx-font-size:16pt;
 	-fx-background-color:white;
