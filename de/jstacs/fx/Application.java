@@ -569,20 +569,49 @@ public class Application {
 			Region reg = new Region();
 			HBox.setHgrow( reg, Priority.ALWAYS );
 			head.getChildren().add( reg );
+			
+			if(tools[idx].getReferences() != null && tools[idx].getReferences().length>0) {
+				
+				Button citation = new Button( "\u201e\u201d" );
+				citation.setId("citationbutton");
+				citation.setPrefSize( 20, 20 );
+				citation.setMinSize( 20, 20 );
+				Platform.runLater(() -> {
+					final CitationViewer cv = new CitationViewer(tools[idx]);
+					citation.setOnAction( new EventHandler<ActionEvent>() {
+
+						@Override
+						public void handle( ActionEvent arg0 ) {
+							cv.show();
+						}
+
+					} );
+				});
+				head.getChildren().add( citation );
+				HBox smallSpacer = new HBox();
+				smallSpacer.setMaxWidth(5);
+				smallSpacer.setMinWidth(5);
+				smallSpacer.setPrefWidth(5);
+				head.getChildren().add(smallSpacer);
+			}
+			
+			
 			Button help = new Button( "?" );
 			help.setId( "helpbutton" );
 			help.setPrefSize( 20, 20 );
 			help.setMinSize( 20, 20 );
-			help.setOnAction( new EventHandler<ActionEvent>() {
+			Platform.runLater(() -> {
+				final HelpViewer hv = new HelpViewer( tools[idx] );	
+				help.setOnAction( new EventHandler<ActionEvent>() {
 
-				@Override
-				public void handle( ActionEvent arg0 ) {
-					new HelpViewer( tools[idx] );					
-				}
-				
-			} );
-			
-			
+					@Override
+					public void handle( ActionEvent arg0 ) {
+						hv.show();
+					}
+
+				} );
+			});
+
 			head.getChildren().add( help );
 			
 			pane.widthProperty().addListener( new ChangeListener<Number>(){

@@ -1,28 +1,9 @@
 package de.jstacs.fx;
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
-import javafx.concurrent.Worker.State;
-import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.web.WebView;
-import javafx.stage.Stage;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.html.HTMLAnchorElement;
 
 import de.jstacs.tools.JstacsTool;
 
@@ -34,76 +15,22 @@ import de.jstacs.tools.JstacsTool;
  * @author Jan Grau
  *
  */
-public class HelpViewer extends Stage {
+public class HelpViewer extends Viewer {
 
 	/**
 	 * Creates a new {@link HelpViewer} for a specific {@link JstacsTool}.
 	 * @param tool the tool
 	 */
 	public HelpViewer(JstacsTool tool){
-		super();
-		this.setTitle( "Help for "+tool.getToolName() );
+		super(tool);
 		
-		String content = tool.getHelpText();
-		
-		content = parse(content);
-		
-		WebView view = new WebView();
-		view.getEngine().loadContent( content );
-		
-		view.getEngine().getLoadWorker().stateProperty().addListener( new ChangeListener<State>(){
-
-			@Override
-			public void changed( ObservableValue<? extends State> arg0, State arg1, State arg2 ) {
-				if(arg2 == State.SUCCEEDED){
-					Document doc = view.getEngine().getDocument();
-					NodeList list = doc.getElementsByTagName( "a" );
-					for(int i=0;i<list.getLength();i++){
-						EventTarget target = (EventTarget)list.item( i );
-						target.addEventListener( "click", new EventListener() {
-							
-							@Override
-							public void handleEvent( Event evt ) {
-								EventTarget target = evt.getCurrentTarget();
-		                        HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
-		                        String href = anchorElement.getHref();
-		                        
-		                        Desktop d = Desktop.getDesktop();
-		                        
-		                        try {
-									d.browse( new URI(href) );
-								} catch ( IOException e ) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch ( URISyntaxException e ) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-		                        
-		                        evt.preventDefault();
-							}
-						}, false );
-					}
-				}
-			}
-			
-		} );
-		
-		BorderPane pane = new BorderPane();
-		pane.setCenter( view );
-		
-		Scene scene = new Scene( pane, 500, 400 );
-		
-		this.setScene( scene );
-		
-		//this.setAlwaysOnTop( true );
-		
-		this.show();
 		
 	}
 	
 	
-	private static String parse(String restruct){
+	protected String parse(JstacsTool tool){
+		
+		String restruct = tool.getHelpText();
 		String[] lines = restruct.split( "\n" );
 		
 		Pattern bold = Pattern.compile( "\\*\\*(.+?)\\*\\*" );
@@ -164,6 +91,12 @@ public class HelpViewer extends Stage {
 		}
 		sb.append("</div>");
 		return sb.toString();
+	}
+
+
+	@Override
+	protected String getTitle(JstacsTool tool) {
+		return "Help for "+tool.getToolName();
 	}
 	
 	
