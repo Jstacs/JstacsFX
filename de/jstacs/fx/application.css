@@ -69,6 +69,7 @@
 	-fx-padding:0;
 	-fx-border-radius: 20;
 	-fx-background-radius: 20;
+	-fx-font-size:10pt;
 }
 
 #splash{
