@@ -77,6 +77,8 @@ public class SelectionParameterRenderer extends AbstractParameterRenderer<Select
 						Pane temp = renderer.render( (ParameterSet)parameter.getValue(), ready );
 						pane.getChildren().clear();
 						pane.getChildren().addAll( temp.getChildren() );
+						pane.getStyleClass().clear();
+						pane.getStyleClass().addAll(temp.getStyleClass());
 					}
 					
 				} catch ( IllegalValueException e ) {

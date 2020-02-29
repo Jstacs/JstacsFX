@@ -558,6 +558,7 @@ public class Application {
 			String title = tools[i].getToolName();
 			
 			Pane content = getToolParameters( tools[i], tools[i].getToolParameters() );
+			content.setId("topmost");
 			
 			TitledPane titled = new TitledPane( );
 			titled.setContent( content );
