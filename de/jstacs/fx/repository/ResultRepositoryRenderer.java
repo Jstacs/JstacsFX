@@ -49,6 +49,7 @@ import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableColumn.CellDataFeatures;
 import javafx.scene.control.TreeTableColumn.CellEditEvent;
 import javafx.scene.control.TreeTableView;
+import javafx.scene.control.cell.TextFieldTreeTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.DirectoryChooser;
@@ -111,13 +112,14 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 	
 	private Control renderRepository(){
 	
-		TreeTableColumn<Result, Label> nameColumn = new TreeTableColumn<Result, Label>("Name");
-		nameColumn.setCellValueFactory( new Callback<TreeTableColumn.CellDataFeatures<Result,Label>, ObservableValue<Label>>() {
+		TreeTableColumn<Result, String> nameColumn = new TreeTableColumn<Result, String>("Name");
+		nameColumn.setCellValueFactory( new Callback<TreeTableColumn.CellDataFeatures<Result,String>, ObservableValue<String>>() {
 			
 			@Override
-			public ObservableValue<Label> call( CellDataFeatures<Result, Label> arg0 ) {
+			public ObservableValue<String> call( CellDataFeatures<Result, String> arg0 ) {
+				
 				//return new ReadOnlyStringWrapper( arg0.getValue().getValue().getComment() );
-				Label lab = new Label(arg0.getValue().getValue().getName());
+				/*Label lab = new Label(arg0.getValue().getValue().getName());
 				String comment = arg0.getValue().getValue().getComment();
 				if(comment != null && comment.trim().length() > 0){
 					Tooltip tt = new Tooltip(comment);
@@ -155,17 +157,17 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 						}
 
 					});
-				}
+				}*/
 				//return new ReadOnlyObjectWrapper<Label>(lab);
-				SimpleObjectProperty<Label> prop = new SimpleObjectProperty<Label>(lab);
+				//SimpleObjectProperty<Label> prop = new SimpleObjectProperty<Label>(lab);
+				SimpleObjectProperty<String> prop = new SimpleObjectProperty<String>(arg0.getValue().getValue().getName());
 				return prop;
 			}
 		} );
 		
 		
 		
-		
-		Callback<TreeTableColumn<Result, Label>, TreeTableCell<Result, Label>> cellFactory = (TreeTableColumn<Result,Label> p) -> new TreeTableCell<Result,Label>(){
+		Callback<TreeTableColumn<Result, String>, TreeTableCell<Result, String>> cellFactory = (TreeTableColumn<Result,String> p) -> new TreeTableCell<Result,String>(){
 			 private TextField textField;
 			 
 			@Override
@@ -183,17 +185,29 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 	        public void cancelEdit() {
 	            super.cancelEdit();
 	 
-	           // setText( getItem().getText() );
-	            setGraphic(getItem());
+	            setGraphic(null);
+	            setText( getItem() );
+	            
 	        }
 	 
+	        
 	        @Override
-	        public void updateItem(Label item, boolean empty) {
+	        public void updateItem(String item, boolean empty) {
 	            super.updateItem(item, empty);
-	 
+	            if(this.getTreeTableRow().getItem() != null) {
+	            	String comment = this.getTreeTableRow().getItem().getComment();
+	            	if(comment != null && comment.length()>0) {
+
+	            		Tooltip tt = new Tooltip(comment);
+	            		tt.setPrefWidth(300);
+	            		tt.setWrapText(true);
+
+	            		Tooltip.install(this, tt);
+	            	}
+	            }
 	            if (empty) {
-	                setText(null);
-	                setGraphic(item);
+	            	setGraphic(null);
+	                setText( getItem() );
 	            } else {
 	                if (isEditing()) {
 	                    if (textField != null) {
@@ -202,8 +216,8 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 	                    setText(null);
 	                    setGraphic(textField);
 	                } else {
-	                    //setText(getString());
-	                    setGraphic(item);
+	                	setGraphic(null);
+	                	setText( getItem() );
 	                }
 	            }
 	        }
@@ -215,20 +229,14 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 					
 					@Override
 					public void handle( ActionEvent event ) {
-						commitEdit(new Label(textField.getText()));			
+						commitEdit(textField.getText());			
 					}
 				});
-	           /* textField.focusedProperty().addListener(
-	                (ObservableValue<? extends Boolean> arg0, 
-	                Boolean arg1, Boolean arg2) -> {
-	                    if (!arg2) {
-	                        commitEdit(new Label(textField.getText()));
-	                    }
-	            });*/
+	           
 	        }
 	 
 	        private String getString() {
-	            return getItem() == null ? "" : getItem().getText();
+	            return getItem() == null ? "" : getItem();
 	        }
 			
         };
@@ -237,11 +245,12 @@ public class ResultRepositoryRenderer implements ResultConsumer{
             
             
 		nameColumn.setCellFactory( cellFactory  );
-		nameColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Result,Label>>() {
+        //nameColumn.setCellFactory( TextFieldTreeTableCell.forTreeTableColumn());
+		nameColumn.setOnEditCommit(new EventHandler<TreeTableColumn.CellEditEvent<Result,String>>() {
 
 			@Override
-			public void handle(CellEditEvent<Result, Label> event) {
-				event.getRowValue().getValue().rename(event.getNewValue().getText());
+			public void handle(CellEditEvent<Result, String> event) {
+				event.getRowValue().getValue().rename(event.getNewValue());
 				ResultRepository.getInstance().notifyRefresh(event.getRowValue().getValue());
 			}
 			
@@ -249,36 +258,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		nameColumn.setEditable(true);
 		
 		
-		/*TreeTableColumn<Result, Label> commentColumn = new TreeTableColumn<Result, Label>("Comment");
-		commentColumn.setCellValueFactory( new Callback<TreeTableColumn.CellDataFeatures<Result,Label>, ObservableValue<Label>>() {
-			
-			@Override
-			public ObservableValue<Label> call( CellDataFeatures<Result, Label> arg0 ) {
-				//return new ReadOnlyStringWrapper( arg0.getValue().getValue().getComment() );
-				Label lab = new Label(arg0.getValue().getValue().getComment() );
-				Tooltip tt = new Tooltip(arg0.getValue().getValue().getComment());
-				tt.setPrefWidth(300);
-				tt.setWrapText(true);
-				lab.setOnMouseEntered(new EventHandler<MouseEvent>() {
-
-					@Override
-					public void handle(MouseEvent event) {
-						Point2D p = lab.localToScreen(lab.getLayoutBounds().getMaxX(), lab.getLayoutBounds().getMaxY());
-				        tt.show(lab, p.getX(), p.getY());
-					}
-					
-				});
-				lab.setOnMouseExited(new EventHandler<MouseEvent>(){
-					
-					public void handle(MouseEvent event) {
-						tt.hide();
-					}
-					
-				});
-				return new ReadOnlyObjectWrapper<Label>(lab);
-			}
-		} );
-		*/
+		
 		
 		
 		TreeTableColumn<Result, String> valueColumn = new TreeTableColumn<Result, String>("Value");
@@ -462,9 +442,7 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		
 		
 		List<Result> list = ResultRepository.getInstance().getResults();
-		
-		
-		
+				
 		
 		ttv = new TreeTableView<>();
 				
@@ -473,6 +451,10 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 		ttv.getColumns().setAll( nameColumn, /*commentColumn,*/ valueColumn, dateCol, saveColumn, removeColumn , restartColumn);
 		
 		nameColumn.setPrefWidth(200);
+		saveColumn.setPrefWidth(100);
+		removeColumn.setPrefWidth(100);
+		restartColumn.setPrefWidth(100);
+		dateCol.setPrefWidth(200);
 		//commentColumn.setPrefWidth(200);
 		
 		addResults(root,list);
