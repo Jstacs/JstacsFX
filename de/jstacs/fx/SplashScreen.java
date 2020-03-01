@@ -4,6 +4,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -32,13 +33,14 @@ public class SplashScreen extends Scene {
 		
 		content.setCenter( message );
 		
-		ProgressBar bar = new ProgressBar(-1);
+		/*ProgressBar bar = new ProgressBar(-1);
 		
-		bar.prefWidthProperty().bind( content.widthProperty() );
+		bar.prefWidthProperty().bind( content.widthProperty() );*/
 		
 		ProgressIndicator ind = new ProgressIndicator( -1 );
-		
-		content.setBottom( ind );
+		HBox hb = new HBox(ind);
+		content.setBottom( hb );
+		content.getBottom().setStyle("-fx-alignment:center;");
 		content.setStyle( "-fx-padding:20;" );
 		//content.setLeft( ind );
 		
