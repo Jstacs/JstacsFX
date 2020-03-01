@@ -86,8 +86,13 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
-					view.setFitWidth( view.getFitWidth()*1.1 );
-					view.setFitHeight(-1);
+					if(view.getFitWidth()>0) {
+						view.setFitWidth( view.getFitWidth()*1.1 );
+						view.setFitHeight(-1);
+					}else {
+						view.setFitWidth(-1);
+						view.setFitHeight( view.getFitHeight()*1.1 );
+					}
 				}
 			} );
 			Button minus = new Button( "-" );
@@ -95,8 +100,13 @@ public class PlotGeneratorResultRenderer implements ResultRenderer<PlotGenerator
 				
 				@Override
 				public void handle( ActionEvent arg0 ) {
-					view.setFitWidth( view.getFitWidth()/1.1 );	
-					view.setFitHeight(-1);
+					if(view.getFitWidth()>0) {
+						view.setFitWidth( view.getFitWidth()/1.1 );
+						view.setFitHeight(-1);
+					}else {
+						view.setFitWidth(-1);
+						view.setFitHeight( view.getFitHeight()/1.1 );
+					}
 				}
 			} );
 			
