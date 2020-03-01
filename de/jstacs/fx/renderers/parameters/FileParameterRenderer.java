@@ -237,7 +237,7 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		}
 
 		FileRepresentation fr = new FileRepresentation(f.getAbsolutePath());
-		TextResult fres = new TextResult( f.getName(), "", fr, false, parameter.getAcceptedMimeType(), "Loaded from file", parameter.getExtendedType(), false );
+		TextResult fres = new TextResult( f.getName(), "Loaded from "+f.getAbsolutePath(), fr, false, parameter.getAcceptedMimeType(), "Loaded from file", parameter.getExtendedType(), false );
 		try {
 			fres.fill( parameter );
 			//System.out.println("adding");
