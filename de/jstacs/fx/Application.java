@@ -454,6 +454,8 @@ public class Application {
 								}
 								msg = msg+"\n";
 							}
+							System.err.println(exception);
+							exception.printStackTrace();
 							
 							messageOverlay.displayMessage( tool.getToolName()+" failed:\n"+msg+"See protocol for details", Level.WARNING );
 						}else if( arg0.getEventType().equals( WorkerStateEvent.WORKER_STATE_CANCELLED ) ){
@@ -729,19 +731,29 @@ public class Application {
 	    
 	    check.selectedProperty().bindBidirectional( ResultRepository.autosave );
 	    
-	    check.setSelected( prefs.getBoolean( "autosave", false ) );
+	    check.setSelected(false);
+	    prefs.putBoolean("autosave", false);
 	    
 	    check.selectedProperty().addListener( new ChangeListener<Boolean>(){
 
 			@Override
 			public void changed( ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2 ) {
 				prefs.putBoolean( "autosave", arg2 );
+				
+				if(arg2) {
+					File f = LoadSaveDialogs.showSaveDialog(mainWindow, "autosave", "JST", "*.jst");
+
+					if(f == null) {
+						prefs.putBoolean("autosave", false);
+					}else {
+						ResultRepository.autodir.set(f.getAbsolutePath());
+					}
+				}
+				
 				ResultRepository.getInstance().autostore();
 			}
 	    	
 	    });
-	    
-	    
 	    
 	    Button save = new Button( "Save workspace..." );
 	    
