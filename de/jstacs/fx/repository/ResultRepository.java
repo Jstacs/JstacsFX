@@ -9,6 +9,8 @@ import java.util.List;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import de.jstacs.fx.Application;
 import de.jstacs.fx.renderers.parameters.FileParameterRenderer;
 import de.jstacs.io.FileManager;
@@ -65,6 +67,7 @@ public class ResultRepository {
 	 * Global property for an {@link Application} run, if the workspace is automatically saved to disk.
 	 */
 	public static BooleanProperty autosave = new SimpleBooleanProperty( false );
+	public static StringProperty autodir = new SimpleStringProperty(null);
 	private static ResultRepository instance;
 	
 	private LinkedList<Result> results;
@@ -85,7 +88,7 @@ public class ResultRepository {
 		this.results = new LinkedList<>();
 		this.consumers = new ArrayList<>();
 		if(autosave.get()){
-			File f = new File("autosave.jst");
+			File f = new File(autodir.get());
 			if(f.exists()){
 				try{
 					StringBuffer sb = FileManager.readFile( f );
@@ -152,7 +155,7 @@ public class ResultRepository {
 				@Override
 				public void run() {
 					try{
-						FileManager.writeFile( "autosave.jst", Compression.zip( storeResultsToXML().toString() ) );
+						FileManager.writeFile( autodir.get(), Compression.zip( storeResultsToXML().toString() ) );
 					}catch(IOException e){
 						e.printStackTrace();
 					}
