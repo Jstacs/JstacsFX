@@ -40,7 +40,17 @@ public class SimpleParameterRenderer extends AbstractParameterRenderer<SimplePar
 			final CheckBox cb = new CheckBox();
 			cb.setIndeterminate(false);
 			
-			cb.setSelected((Boolean) parameter.getValue());
+			Boolean val = (Boolean) parameter.getValue();
+			if(val == null) {
+				val = false;
+				try {
+					parameter.setValue(false);
+				} catch (IllegalValueException e) {
+					e.printStackTrace();
+				}
+			}
+			
+			cb.setSelected(val);
 			
 			parent.getChildren().add(cb);
 			
