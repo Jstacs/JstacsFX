@@ -80,7 +80,8 @@ public class FileParameterRenderer extends AbstractParameterRenderer<FileParamet
 		
 		public boolean equals(Object other){
 			if(other instanceof ResultContainer && res != null ){
-				return res.equals( ((ResultContainer)other).res );
+				//return res.equals( ((ResultContainer)other).res );
+				return res == ((ResultContainer)other).res;
 			}else{
 				return false;
 			}
