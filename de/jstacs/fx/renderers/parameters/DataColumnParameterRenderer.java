@@ -83,7 +83,7 @@ public class DataColumnParameterRenderer extends AbstractParameterRenderer<DataC
 		
 		ChoiceBox box = FileParameterRenderer.getBox(cache.get(parameter));
 		
-		box.getSelectionModel().selectedIndexProperty().addListener( new ChangeListener(){
+		box.getSelectionModel().selectedItemProperty().addListener( new ChangeListener(){
 
 			@Override
 			public void changed(ObservableValue observable, Object oldValue, Object newValue) {
