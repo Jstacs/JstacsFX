@@ -745,6 +745,7 @@ public class Application {
 
 					if(f == null) {
 						prefs.putBoolean("autosave", false);
+						check.setSelected(false);
 					}else {
 						ResultRepository.autodir.set(f.getAbsolutePath());
 					}
