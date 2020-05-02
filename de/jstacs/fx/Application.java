@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -23,9 +24,11 @@ import de.jstacs.tools.ProgressUpdater;
 import de.jstacs.tools.Protocol;
 import de.jstacs.tools.ToolParameterSet;
 import de.jstacs.tools.ToolResult;
+import de.jstacs.tools.ui.cli.CLI;
 import de.jstacs.utils.Compression;
 import de.jstacs.utils.Pair;
 import javafx.animation.Transition;
+import javafx.application.Application.Parameters;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
@@ -290,6 +293,8 @@ public class Application {
 
 	private HashMap<String,TitledPane> paneMap;
 	
+	private Parameters pars;
+	
 	
 	/**
 	 * Creates a new {@link Application} with the provided title in the main window for
@@ -297,8 +302,8 @@ public class Application {
 	 * @param title the title of the main window
 	 * @param tools the tools used in this application
 	 */
-	public Application(String title, JstacsTool... tools){
-		this(title,true,tools);
+	public Application(Parameters pars, String title, JstacsTool... tools){
+		this(pars, title,true,tools);
 	}
 	
 	/**
@@ -308,7 +313,8 @@ public class Application {
 	 * @param showStackTraceInProtocol if stack traces of {@link Exception}s that are thrown by {@link JstacsTool} show be shown as warnings in the protocol
 	 * @param tools the tools used in this application
 	 */
-	public Application(String title, boolean showStackTraceInProtocol, JstacsTool... tools){
+	public Application(Parameters pars, String title, boolean showStackTraceInProtocol, JstacsTool... tools){
+		this.pars = pars;
 		this.title = title;
 		this.tools = tools;
 		enqueuedJobs = FXCollections.<Task<ResultSetResult>>observableArrayList(e -> new Observable[] {e.stateProperty(),e.exceptionProperty(),e.onRunningProperty(),e.onSucceededProperty(),e.onFailedProperty()});
@@ -1133,6 +1139,29 @@ public class Application {
 		showApplication( border, primaryStage );
 		
 		
+		
+	}
+
+	public boolean test() throws URISyntaxException {
+		if(pars == null) {
+			return true;
+		}
+		String[] args = pars.getRaw().toArray(new String[0]);
+		
+		if(args.length==2 && "test".equals(args[1])) {
+			
+			File jarfile = new File(Application.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			for(int i=0;i<tools.length;i++) {
+				if(tools[i].getShortName().equals(args[0])) {
+					System.out.println("Running test for "+tools[i].getToolName());
+					double res = JstacsTool.test(tools[i], jarfile.getParentFile().getAbsolutePath(), true);
+					System.out.println((res*100)+"% of tests successful");
+				}
+			}
+			return false;
+		}else {
+			return true;
+		}
 		
 	}
 	
