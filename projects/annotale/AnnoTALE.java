@@ -43,7 +43,7 @@ public class AnnoTALE extends javafx.application.Application {
 		                                      new QuickTBSPredictionTool(),
 		                                      new DerTALE()};
 		
-        Application a = new Application( "AnnoTALE "+version, tools );
+        Application a = new Application( this.getParameters(), "AnnoTALE "+version, tools );
 		//primaryStage.getIcons().add(new Image(this.getClass().getResourceAsStream("projects/xanthogenomes/tools/AnnoTALE_small.png")));
 		
         a.startWithSplash( primaryStage, "Starting AnnoTALE "+version+"..." );

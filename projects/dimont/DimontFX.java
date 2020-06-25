@@ -1,32 +1,36 @@
 package projects.dimont;
-import de.jstacs.classifiers.differentiableSequenceScoreBased.AbstractMultiThreadedOptimizableFunction;
 import de.jstacs.fx.Application;
+import de.jstacs.tools.JstacsTool;
 import javafx.stage.Stage;
-import projects.dimont.DimontPredictorTool;
-import projects.dimont.DimontTool;
-import projects.dimont.ExtractSequencesTool;
+import projects.quickscan.QuickBindingSitePredictionTool;
+import projects.slim.SlimDimontTool;
 
 public class DimontFX extends javafx.application.Application  {
 
-	
 	public static void main(String[] args) {
 		
-		launch(args);
 		
+		launch(args);
     }
 	
 	@Override
 	public void start( Stage primaryStage ) throws Exception {
 		
-		DimontTool tool = new DimontTool();
+		JstacsTool[] tools = new JstacsTool[] {
+				new ExtractSequencesTool(),
+				new DimontTool(),
+				new SlimDimontTool(),
+				new DimontPredictorTool(),
+				new QuickBindingSitePredictionTool()
+		};
 		
-		DimontPredictorTool pred = new DimontPredictorTool();
-		
-		ExtractSequencesTool est = new ExtractSequencesTool();
-
-        Application a = new Application( "Dimont "+tool.getToolVersion(), est, tool, pred );
-		
-        a.startWithSplash( primaryStage, "Starting Dimont "+tool.getToolVersion()+"..." );
+        Application a = new Application(  this.getParameters(), "Dimont 1.0", tools );
+        
+        if(a.test()) {
+        	a.startWithSplash( primaryStage, "Starting Dimont 1.0 ..." );
+        }else {
+        	System.exit(0);
+        }
 		
 
 	}
