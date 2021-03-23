@@ -1,4 +1,6 @@
 package de.jstacs.fx;
+import java.awt.Desktop;
+import java.awt.Desktop.Action;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
@@ -79,7 +81,11 @@ public class HelpViewer extends Viewer {
 			while( it.hasNext() ){
 				Pattern pat = it.next();
 				Matcher m = pat.matcher( lines[i] );
-				lines[i] = m.replaceAll( "<a href=\""+linkTargets.get( pat )+"\">$1</a>" );
+				if(Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Action.BROWSE)) {
+					lines[i] = m.replaceAll( "<a href=\""+linkTargets.get( pat )+"\">$1</a>" );
+				}else {
+					lines[i] = m.replaceAll( "$1 ("+linkTargets.get( pat )+")" );
+				}
 			}
 		}
 		
