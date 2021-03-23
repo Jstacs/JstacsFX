@@ -1,6 +1,7 @@
 package de.jstacs.fx;
 
 import java.awt.Desktop;
+import java.awt.Desktop.Action;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -58,18 +59,22 @@ public abstract class Viewer extends Stage {
 		                        HTMLAnchorElement anchorElement = (HTMLAnchorElement) target;
 		                        String href = anchorElement.getHref();
 		                        
-		                        Desktop d = Desktop.getDesktop();
-		                        
-		                        try {
-									d.browse( new URI(href) );
-								} catch ( IOException e ) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								} catch ( URISyntaxException e ) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-		                        
+		                        if(Desktop.isDesktopSupported()) {
+		                        	Desktop d = Desktop.getDesktop();
+
+		                        	if(d.isSupported(Action.BROWSE)) {
+		                        		try {
+		                        			d.browse( new URI(href) );
+		                        		} catch ( IOException e ) {
+		                        			// TODO Auto-generated catch block
+		                        			e.printStackTrace();
+		                        		} catch ( URISyntaxException e ) {
+		                        			// TODO Auto-generated catch block
+		                        			e.printStackTrace();
+		                        		}
+		                        	}
+
+		                        }
 		                        evt.preventDefault();
 							}
 						}, false );
