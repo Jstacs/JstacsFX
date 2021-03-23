@@ -315,14 +315,15 @@ public class ResultRepositoryRenderer implements ResultConsumer{
 							if(saver.isAtomic()){
 
 								String[] ft = saver.getFileExtensions( res );
-
+								
+								String filename = res.getName().replaceAll( "[\\s\\:\\/]", "_" ) + (ft != null && ft.length>0 ? "."+ft[0] : "");
+								
 								for(int i=0;i<ft.length;i++){
 									ft[i] = "*."+ft[i];
 								}
-								
 								String name = Arrays.toString( ft ).replaceAll( "(\\[|\\])", "" ).toUpperCase();
 
-								File f = LoadSaveDialogs.showSaveDialog(Application.mainWindow, res.getName(), name, ft);
+								File f = LoadSaveDialogs.showSaveDialog(Application.mainWindow, filename , name, ft);
 								if(f == null){
 									return;
 								}else{
