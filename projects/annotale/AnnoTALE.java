@@ -18,7 +18,7 @@ import projects.xanthogenomes.tools.TALEPredictionTool;
 
 public class AnnoTALE extends javafx.application.Application {
 
-	private static String version = "1.4.1";
+	private static String version = "1.5";
 	
 	
 	public static void main(String[] args) {
