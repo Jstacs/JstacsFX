@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 public class EpiTALE extends javafx.application.Application {
 	
-	private static String version = "1.0";
+	private static String version = "0.1";
 	
 	
 	public static void main(String[] args) {
