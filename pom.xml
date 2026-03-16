@@ -64,7 +64,7 @@
     <dependency>
       <groupId>de.jstacs</groupId>
       <artifactId>jstacs-core</artifactId>
-      <version>2.5.1-SNAPSHOT</version>
+      <version>2.5.0</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
