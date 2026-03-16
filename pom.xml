@@ -11,18 +11,60 @@
   <description>Jstacs generic interface using JavaFX.</description>
   <url>https://www.jstacs.de</url>
 
+  <licenses>
+    <license>
+      <name>GNU General Public License, version 3 or later (GPL-3.0-or-later)</name>
+      <url>https://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <id>jgraux</id>
+      <name>Jan Grau</name>
+      <email>grau@informatik.uni-halle.de</email>
+      <organization>Martin-Luther-Universität Halle-Wittenberg</organization>
+      <organizationUrl>https://www.informatik.uni-halle.de</organizationUrl>
+    </developer>
+    <developer>
+      <id>JensKeilwagen</id>
+      <name>Jens Keilwagen</name>
+      <organization>Julius Kühn-Institut</organization>
+      <organizationUrl>https://www.julius-kuehn.de</organizationUrl>
+    </developer>
+    <developer>
+      <id>aerkes</id>
+      <name>Annett Erkes</name>
+      <organization>Martin-Luther-Universität Halle-Wittenberg</organization>
+      <organizationUrl>https://www.informatik.uni-halle.de</organizationUrl>
+    </developer>
+    <developer>
+      <id>lemora</id>
+      <name>Lea Morschel</name>
+      <organization>Martin-Luther-Universität Halle-Wittenberg</organization>
+      <organizationUrl>https://www.informatik.uni-halle.de</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/jstacs/jstacsfx.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jstacs/jstacsfx.git</developerConnection>
+    <url>https://github.com/jstacs/jstacsfx</url>
+    <tag>HEAD</tag>
+  </scm>
+
   <properties>
     <maven.compiler.source>23</maven.compiler.source>
     <maven.compiler.target>23</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <log4j2.version>2.23.1</log4j2.version>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>de.jstacs</groupId>
       <artifactId>jstacs-core</artifactId>
-      <version>2.5.0-SNAPSHOT</version>
+      <version>2.5.1-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -45,4 +87,125 @@
       <version>27-ea+1</version>
     </dependency>
   </dependencies>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <properties>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.9.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <tokenAuth>true</tokenAuth>
+              <autoPublish>true</autoPublish>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.3.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.8</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <gpgArguments>
+                <arg>--pinentry-mode</arg>
+                <arg>loopback</arg>
+              </gpgArguments>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <encoding>${project.build.sourceEncoding}</encoding>
+          <release>${maven.compiler.release}</release>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.4.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.11.2</version>
+          <configuration>
+            <doclint>none</doclint>
+            <additionalOptions>
+              <additionalOption>--allow-script-in-comments</additionalOption>
+              <additionalOption>-header</additionalOption>
+              <additionalOption>'&lt;script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"&gt;&lt;/script&gt;'</additionalOption>
+            </additionalOptions>
+          </configuration>
+          <executions>
+            <execution>
+              <id>attach-javadocs</id>
+              <goals>
+                <goal>jar</goal>
+              </goals>
+            </execution>
+          </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>3.1.1</version>
+        <configuration>
+          <preparationProfiles>release</preparationProfiles>
+          <releaseProfiles>release</releaseProfiles>
+          <preparationGoals>clean verify</preparationGoals>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
